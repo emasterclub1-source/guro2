@@ -41,6 +41,20 @@ main{max-width:920px;margin:0 auto;padding:18px 16px 80px}
   border-radius:8px;font-size:13px;outline:none;background:#fff;color:var(--text)}
 .filter-group select:focus,.filter-group input:focus{border-color:var(--p)}
 
+/* QUESTION CHIPS */
+.q-filter{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap}
+.q-chip{padding:6px 11px;border:1.5px solid var(--border);border-radius:14px;
+  background:#fff;color:var(--text);font-size:12px;font-weight:700;cursor:pointer;
+  transition:.15s;user-select:none;display:inline-flex;align-items:center;gap:4px}
+.q-chip:hover{border-color:var(--p);background:#eef2ff}
+.q-chip.sel{background:var(--p);color:#fff;border-color:var(--p)}
+.q-chip .qcnt{font-size:10px;opacity:.7;font-weight:600}
+.q-chip.sel .qcnt{opacity:.85}
+.q-actions{display:flex;gap:4px;margin-top:6px}
+.q-actions button{padding:3px 8px;font-size:10px;border:1px solid var(--border);
+  border-radius:6px;background:transparent;color:var(--muted);cursor:pointer}
+.q-actions button:hover{background:var(--bg);color:var(--text)}
+
 /* STATS */
 .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
   gap:10px;margin-bottom:16px}
@@ -413,7 +427,7 @@ TEXTBOOK_RAW.forEach(w => {
 
 /* ═══════════════ STATE ═══════════════ */
 let currentView = 'home';
-const filters = {grade:'',year:'',month:'',exam:'',questionNo:''};
+const filters = {grade:'',year:'',month:'',exam:'',questionNos:[]};
 let wrongWords = JSON.parse(localStorage.getItem('wrong_words') || '{}');
 
 const teacherMode = new URLSearchParams(location.search).get('teacher') === '1';
@@ -443,10 +457,7 @@ const getFiltered = () => WORDS.filter(w => {
   if (filters.year && String(w.year) !== String(filters.year)) return false;
   if (filters.month && String(w.month) !== String(filters.month)) return false;
   if (filters.exam && w.exam !== filters.exam) return false;
-  if (filters.questionNo) {
-    const qs = filters.questionNo.split(',').map(s=>s.trim()).filter(Boolean);
-    if (!qs.includes(String(w.questionNo))) return false;
-  }
+  if (filters.questionNos.length && !filters.questionNos.includes(String(w.questionNo))) return false;
   return true;
 });
 
@@ -466,18 +477,73 @@ function renderHome() {
     <div class="filter-group"><label>연도</label><select id="f-year"><option value="">전체</option>${uniqueValues('year').map(v=>`<option ${filters.year===String(v)?'selected':''}>${v}</option>`).join('')}</select></div>
     <div class="filter-group"><label>월</label><select id="f-month"><option value="">전체</option>${uniqueValues('month').map(v=>`<option ${filters.month===String(v)?'selected':''}>${v}월</option>`).join('')}</select></div>
     <div class="filter-group"><label>시험</label><select id="f-exam"><option value="">전체</option>${uniqueValues('exam').map(v=>`<option ${filters.exam===v?'selected':''}>${v}</option>`).join('')}</select></div>
-    <div class="filter-group"><label>문제 번호</label><input id="f-q" placeholder="전체, 예: 18,20" value="${filters.questionNo}"></div>
+    <div class="filter-group" style="grid-column:1/-1"><label>문제 번호 <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">(${filters.questionNos.length}개 선택됨 · 클릭해서 여러 개 골라보세요)</span></label>
+      <div class="q-filter" id="q-chips"></div>
+      <div class="q-actions">
+        <button onclick="qChipsSelect('all')">✓ 전체 선택</button>
+        <button onclick="qChipsSelect('none')">✗ 전체 해제</button>
+        <button onclick="qChipsSelect('first')">앞 5개</button>
+      </div>
+    </div>
   `;
   ['grade','year','month','exam'].forEach(k => {
-    document.getElementById('f-'+k).onchange = e => { filters[k] = e.target.value; renderHome(); };
+    document.getElementById('f-'+k).onchange = e => {
+      filters[k] = e.target.value;
+      filters.questionNos = []; // 다른 필터 바꾸면 번호 선택 초기화
+      renderHome();
+    };
   });
-  document.getElementById('f-q').oninput = e => { filters.questionNo = e.target.value; renderWordList(); };
+  
+  // Generate question chips based on other filters
+  const qTmp = {...filters, questionNos:[]};
+  const avail = WORDS.filter(w => {
+    if (qTmp.grade && w.grade !== qTmp.grade) return false;
+    if (qTmp.year && String(w.year) !== String(qTmp.year)) return false;
+    if (qTmp.month && String(w.month) !== String(qTmp.month)) return false;
+    if (qTmp.exam && w.exam !== qTmp.exam) return false;
+    return true;
+  });
+  const counts = {};
+  avail.forEach(w => { const k = String(w.questionNo); counts[k] = (counts[k]||0)+1; });
+  const qList = [...new Set(avail.map(w => String(w.questionNo)))].sort((a,b) => parseInt(a)-parseInt(b));
+  // Remove selections that are no longer available
+  filters.questionNos = filters.questionNos.filter(q => qList.includes(q));
+  
+  document.getElementById('q-chips').innerHTML = qList.length
+    ? qList.map(q => `<span class="q-chip ${filters.questionNos.includes(q)?'sel':''}" onclick="toggleQ('${q}')">Q${q} <span class="qcnt">${counts[q]||0}</span></span>`).join('')
+    : '<div style="color:var(--muted);font-size:12px;padding:8px 4px">😅 선택 가능한 문제가 없어요. 다른 필터를 조정해보세요.</div>';
+  
   document.getElementById('clear-filter').onclick = () => {
-    Object.keys(filters).forEach(k => filters[k]='');
+    Object.keys(filters).forEach(k => {
+      filters[k] = Array.isArray(filters[k]) ? [] : '';
+    });
     renderHome();
   };
   
   renderWordList();
+}
+
+function toggleQ(q) {
+  const i = filters.questionNos.indexOf(q);
+  if (i >= 0) filters.questionNos.splice(i, 1);
+  else filters.questionNos.push(q);
+  renderHome();
+}
+
+function qChipsSelect(mode) {
+  const qTmp = {...filters, questionNos:[]};
+  const avail = WORDS.filter(w => {
+    if (qTmp.grade && w.grade !== qTmp.grade) return false;
+    if (qTmp.year && String(w.year) !== String(qTmp.year)) return false;
+    if (qTmp.month && String(w.month) !== String(qTmp.month)) return false;
+    if (qTmp.exam && w.exam !== qTmp.exam) return false;
+    return true;
+  });
+  const qList = [...new Set(avail.map(w => String(w.questionNo)))].sort((a,b)=>parseInt(a)-parseInt(b));
+  if (mode === 'all') filters.questionNos = qList;
+  else if (mode === 'none') filters.questionNos = [];
+  else if (mode === 'first') filters.questionNos = qList.slice(0, 5);
+  renderHome();
 }
 
 function renderWordList() {
