@@ -748,7 +748,7 @@ function startQuiz(mode) {
 
 function renderQ() {
   const q = qState.qs[qState.idx];
-  const areaId = qState.mode === 'mcq' ? 'quiz-mcq-area' : 'quiz-write-area';
+  const areaId = qState.mode === 'mcq' ? 'quiz-mcq-area' : (qState.mode === 'exam' ? 'exam-area' : 'quiz-write-area');
   
   if (!q) {
     // End of questions
@@ -762,7 +762,7 @@ function renderQ() {
           ${qState.wrong.map(w=>`<div class="ritem"><div class="ritem-w">${esc(w.word.word)}</div><div class="ritem-c">정답: ${esc(w.answer)}</div></div>`).join('')}
         </div>` : ''}
         <div class="btn-row" style="justify-content:center;margin-top:18px">
-          <button class="btn btn-p" onclick="renderQuizSetup('${qState.mode}')">다시 풀기</button>
+          <button class="btn btn-p" onclick="${qState.mode === 'exam' ? 'renderExam()' : `renderQuizSetup('${qState.mode}')`}">다시 풀기</button>
           <button class="btn btn-o" onclick="setView('home')">홈으로</button>
         </div>
       </div>
@@ -860,7 +860,7 @@ function submitWrite(correct) {
 function quitQuiz() { 
   if (confirm('퀴즈를 그만할까요?')) {
     qState = null;
-    const areaId = currentView === 'quiz-mcq' ? 'quiz-mcq-area' : 'quiz-write-area';
+    const areaId = currentView === 'quiz-mcq' ? 'quiz-mcq-area' : (currentView === 'exam' ? 'exam-area' : 'quiz-write-area');
     document.getElementById(areaId).innerHTML = '';
     setView(currentView);
   }
