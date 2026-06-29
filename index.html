@@ -426,13 +426,14 @@ TEXTBOOK_RAW.forEach(w => {
     year: 0,
     month: 0,
     exam: '교과서',
+    publisher: w.p || '천재(조)',  // 출판사 (기본 천재(조))
     questionNo: w.q
   });
 });
 
 /* ═══════════════ STATE ═══════════════ */
 let currentView = 'home';
-const filters = {grade:'',year:'',month:'',exam:'',questionNos:[]};
+const filters = {grade:'',year:'',month:'',exam:'',publisher:'',questionNos:[]};
 let wrongWords = JSON.parse(localStorage.getItem('wrong_words') || '{}');
 
 const teacherMode = new URLSearchParams(location.search).get('teacher') === '1';
@@ -442,11 +443,17 @@ const shuffle = a => { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=0|M
 const esc = s => { const d=document.createElement('div');d.textContent=s;return d.innerHTML; };
 // 단어 라벨 포매팅 (교과서는 단원 "4과", 시험은 "Q18")
 const fmtQ = w => w.exam === '교과서' ? `${w.questionNo}과` : `Q${w.questionNo}`;
-// 출처 라벨 (교과서: 📚 단원, 모의고사: 📝 년/월 시험)
+// 출처 라벨 (교과서: 📚 출판사 단원, 모의고사: 📝 년/월 시험)
 const srcBadge = w => {
   const isTextbook = w.exam === '교과서';
   const cls = isTextbook ? 'b-exam tb' : 'b-exam';
-  const text = isTextbook ? `📚 교과서 ${w.questionNo}과` : `📝 ${w.year}년 ${w.month}월 ${esc(w.exam)}`;
+  let text;
+  if (isTextbook) {
+    const pub = w.publisher ? esc(w.publisher) : '';
+    text = `📚 ${pub} ${w.questionNo}과`.trim();
+  } else {
+    text = `📝 ${w.year}년 ${w.month}월 ${esc(w.exam)}`;
+  }
   return {cls, text, isTextbook};
 };
 const setView = (name) => {
@@ -471,6 +478,7 @@ const getFiltered = () => WORDS.filter(w => {
   if (filters.year && String(w.year) !== String(filters.year)) return false;
   if (filters.month && String(w.month) !== String(filters.month)) return false;
   if (filters.exam && w.exam !== filters.exam) return false;
+  if (filters.publisher && w.publisher !== filters.publisher) return false;
   if (filters.questionNos.length && !filters.questionNos.includes(String(w.questionNo))) return false;
   return true;
 });
@@ -486,11 +494,15 @@ function renderHome() {
   
   // Filter bar
   const fb = document.getElementById('filter-bar');
+  // 출판사 목록 (교과서 단어 중 실제로 있는 것만 동적)
+  const publishers = [...new Set(WORDS.filter(w => w.exam === '교과서').map(w => w.publisher).filter(Boolean))];
+  
   fb.innerHTML = `
     <div class="filter-group"><label>학년</label><select id="f-grade"><option value="">전체</option>${uniqueValues('grade').map(v=>`<option ${filters.grade===v?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="filter-group"><label>시험 (구분)</label><select id="f-exam"><option value="">전체</option>${uniqueValues('exam').map(v=>`<option ${filters.exam===v?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="filter-group" id="f-pub-wrap" style="${filters.exam==='교과서'?'':'display:none'}"><label>교재 (출판사)</label><select id="f-pub"><option value="">전체</option>${publishers.map(p=>`<option ${filters.publisher===p?'selected':''}>${p}</option>`).join('')}</select></div>
     <div class="filter-group"><label>연도</label><select id="f-year"><option value="">전체</option>${uniqueValues('year').map(v=>`<option ${filters.year===String(v)?'selected':''}>${v}</option>`).join('')}</select></div>
     <div class="filter-group"><label>월</label><select id="f-month"><option value="">전체</option>${uniqueValues('month').map(v=>`<option ${filters.month===String(v)?'selected':''}>${v}월</option>`).join('')}</select></div>
-    <div class="filter-group"><label>시험</label><select id="f-exam"><option value="">전체</option>${uniqueValues('exam').map(v=>`<option ${filters.exam===v?'selected':''}>${v}</option>`).join('')}</select></div>
     <div class="filter-group" style="grid-column:1/-1"><label>문제 번호 <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">(${filters.questionNos.length}개 선택됨 · 클릭해서 여러 개 골라보세요)</span></label>
       <div class="q-filter" id="q-chips"></div>
       <div class="q-actions">
@@ -500,13 +512,33 @@ function renderHome() {
       </div>
     </div>
   `;
-  ['grade','year','month','exam'].forEach(k => {
+  ['grade','year','month','exam','pub'].forEach(k => {
     document.getElementById('f-'+k).onchange = e => {
-      filters[k] = e.target.value;
+      if (k === 'exam') {
+        filters.exam = e.target.value;
+        // 교과서가 아니면 출판사 리셋, 교과서로 바꾸면 연도/월 리셋
+        if (filters.exam !== '교과서') filters.publisher = '';
+        if (filters.exam === '교과서') { filters.year = ''; filters.month = ''; }
+      } else if (k === 'pub') {
+        filters.publisher = e.target.value;
+      } else {
+        filters[k] = e.target.value;
+      }
       filters.questionNos = []; // 다른 필터 바꾸면 번호 선택 초기화
       renderHome();
     };
   });
+
+  // 교과서일 때 연도/월 자동 숨김 (출판사는 따로 처리됨)
+  const ymWrap = document.getElementById('f-year')?.parentElement;
+  const yLabel = document.getElementById('f-month')?.parentElement;
+  if (filters.exam === '교과서') {
+    if (ymWrap) ymWrap.style.display = 'none';
+    if (yLabel) yLabel.style.display = 'none';
+  } else {
+    if (ymWrap) ymWrap.style.display = '';
+    if (yLabel) yLabel.style.display = '';
+  }
   
   // Generate question chips based on other filters
   const qTmp = {...filters, questionNos:[]};
@@ -933,7 +965,14 @@ function renderTeacher() {
         <div class="fg"><label class="fl">월</label><input id="t-month" class="fi" type="number" value="3"></div>
       </div>
       <div class="fg-row">
-        <div class="fg"><label class="fl">시험</label><input id="t-exam" class="fi" value="학력평가"></div>
+        <div class="fg"><label class="fl">시험 (구분)</label>
+          <select id="t-exam" class="fi">
+            <option>학력평가</option>
+            <option>모의고사</option>
+            <option>교과서</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">교재 (출판사)</label><input id="t-pub" class="fi" placeholder="천재(조)"></div>
         <div class="fg"><label class="fl">문제 번호</label><input id="t-q" class="fi" type="number" value="0"></div>
       </div>
       <div class="fg"><label class="fl">영어 단어 *</label><input id="t-w" class="fi" placeholder="appreciate"></div>
@@ -1011,6 +1050,7 @@ function addTeacherWord() {
     year: parseInt(document.getElementById('t-year').value) || 2026,
     month: parseInt(document.getElementById('t-month').value) || 3,
     exam: document.getElementById('t-exam').value.trim() || '학력평가',
+    publisher: document.getElementById('t-pub').value.trim() || '',
     questionNo: parseInt(document.getElementById('t-q').value) || 0
   };
   // Save to localStorage as extra word (won't sync cross-device)
@@ -1019,7 +1059,7 @@ function addTeacherWord() {
   localStorage.setItem('extra_words', JSON.stringify(extra));
   WORDS.push(newWord);
   alert(`✅ "${w}" 추가됨 (이 브라우저에만 저장)`);
-  ['t-w','t-kor','t-eng','t-kctx','t-syn','t-ant'].forEach(id => document.getElementById(id).value = '');
+  ['t-w','t-kor','t-eng','t-kctx','t-syn','t-ant','t-pub'].forEach(id => document.getElementById(id).value = '');
 }
 
 function exportWords() {
@@ -1031,9 +1071,11 @@ function exportWords() {
 }
 
 function downloadSample() {
-  const csv = `word,synonyms,antonyms,kor,eng,kor_ctx,grade,year,month,exam,questionNo
-journey,"voyage, trip",stay,여정,"a long trip","긴 여행",고2,2026,3,학력평가,18
-abandon,"desert, leave","keep, retain",버리다,"to give up","포기하다",고2,2026,3,학력평가,19`;
+  const csv = `word,synonyms,antonyms,kor,eng,kor_ctx,grade,year,month,exam,publisher,questionNo
+journey,"voyage, trip",stay,여정,"a long trip","긴 여행",고2,2026,3,학력평가,,18
+abandon,"desert, leave","keep, retain",버리다,"to give up","포기하다",고2,2026,3,학력평가,,19
+cooperate,"collaborate, work together",compete,협력하다,"to work together","함께 일하다",고2,0,0,교과서,천재(조),4
+acquire,"obtain, gain, get",lose,습득하다,"to get something","무언가를 얻다",고2,0,0,교과서,YBM(박),2`;
   const blob = new Blob([csv], {type:'text/csv'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1059,25 +1101,29 @@ function handleImport() {
           });
         }
       } else {
-        // CSV parse
+        // CSV parse (헤더 기반 동적 파싱 — 컬럼 순서 자유)
         const lines = e.target.result.split('\n').filter(l => l.trim());
-        const header = parseCSVLine(lines[0]).map(s => s.toLowerCase());
+        const header = parseCSVLine(lines[0]).map(s => s.toLowerCase().trim());
+        const col = {};
+        header.forEach((h, i) => col[h] = i);
         for (let i = 1; i < lines.length; i++) {
           const r = parseCSVLine(lines[i]);
-          if (!r[0]) continue;
+          if (!r[col['word']]) continue;
+          const isTextbook = (r[col['exam']] || '') === '교과서';
           const w = {
             id: 'imp_' + (++added),
-            word: r[0],
-            syn: r[1] ? r[1].split(',').map(s=>s.trim()).filter(Boolean) : [],
-            ant: r[2] ? r[2].split(',').map(s=>s.trim()).filter(Boolean) : [],
-            kor: r[3] || '',
-            eng: r[4] || '',
-            kor_ctx: r[5] || '',
-            grade: r[6] || '고2',
-            year: parseInt(r[7]) || 2026,
-            month: parseInt(r[8]) || 3,
-            exam: r[9] || '학력평가',
-            questionNo: parseInt(r[10]) || 0
+            word: r[col['word']] || '',
+            syn: r[col['synonyms']] ? r[col['synonyms']].split(',').map(s=>s.trim()).filter(Boolean) : [],
+            ant: r[col['antonyms']] ? r[col['antonyms']].split(',').map(s=>s.trim()).filter(Boolean) : [],
+            kor: r[col['kor']] || '',
+            eng: r[col['eng']] || '',
+            kor_ctx: r[col['kor_ctx']] || '',
+            grade: r[col['grade']] || '고2',
+            year: isTextbook ? 0 : (parseInt(r[col['year']]) || 2026),
+            month: isTextbook ? 0 : (parseInt(r[col['month']]) || 3),
+            exam: r[col['exam']] || '학력평가',
+            publisher: r[col['publisher']] || '',
+            questionNo: parseInt(r[col['questionno'] || col['questionno']]) || 0
           };
           if (!WORDS.find(x => x.word.toLowerCase() === w.word.toLowerCase())) {
             WORDS.push(w);
