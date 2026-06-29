@@ -608,7 +608,7 @@ const matchesSearch = (w, q, scope) => {
   }
 };
 const setName = id => SETS.find(x=>x.id===id)?.name || '알 수 없음';
-const wordsFor = id => id==='all' ? W : W.filter(w=>w.setId===id);
+const wordsFor = id => id==='all' ? W : W.filter(w=>w.setId===id || w.examId===id);
 
 // ── NAV ───────────────────────────────────────────────────────────────────
 function show(id) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('on')); document.getElementById(id).classList.add('on'); }
@@ -646,7 +646,7 @@ function renderSetsBar() {
   bar.innerHTML =
     `<button class="set-tab${curSet==='all'?' active':''}" onclick="selectSet('all')">전체 (${W.length})</button>` +
     SETS.map(s => {
-      const cnt = W.filter(w=>w.setId===s.id).length;
+      const cnt = W.filter(w=>w.setId===s.id || w.examId===s.id).length;
       const pc = pubClass(s.publisher);
       const meta = s.unit ? `<span class="set-tab-meta">${esc(s.unit)}</span>` : '';
       return `<button class="set-tab ${pc}${curSet===s.id?' active':''}" onclick="selectSet('${s.id}')" title="${esc(s.name)}${s.publisher?' · '+esc(s.publisher):''}">
