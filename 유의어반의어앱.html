@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유의어·반의어 암기장</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--p:#4f46e5;--pd:#3730a3;--teal:#0891b2;--ok:#10b981;--err:#ef4444;--bg:#f1f5f9;--card:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--r:12px}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.nav{background:linear-gradient(90deg,var(--p),var(--teal));color:#fff;padding:0 14px;display:flex;align-items:center;height:52px;gap:5px;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.nav-logo{font-size:15px;font-weight:800;flex:1;white-space:nowrap}
+.nav-btn{background:rgba(255,255,255,.18);border:none;color:#fff;padding:5px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;transition:background .15s;white-space:nowrap}
+.nav-btn:hover{background:rgba(255,255,255,.3)}
+.nav-btn.active{background:rgba(255,255,255,.38);font-weight:700}
+.page{display:none;padding:14px;max-width:720px;margin:0 auto}
+.page.on{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+/* HOME */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
+.stat-n{font-size:26px;font-weight:800;color:var(--p)}
+.stat-l{font-size:11px;color:var(--muted);margin-top:2px}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode-btn{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:18px 14px;text-align:center;cursor:pointer;transition:all .18s}
+.mode-btn:hover{border-color:var(--p);transform:translateY(-2px);box-shadow:0 5px 16px rgba(79,70,229,.14)}
+.mode-icon{font-size:28px;margin-bottom:7px}
+.mode-name{font-size:14px;font-weight:700}
+.mode-sub{font-size:11px;color:var(--muted);margin-top:2px}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:4px;padding:7px 14px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--pd)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-danger{background:#fee2e2;color:#991b1b}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-o:hover{background:var(--bg)}
+.btn-sm{padding:4px 9px;font-size:11px}
+.btn-full{width:100%;justify-content:center}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+/* SET TABS */
+.sets-bar{display:flex;align-items:center;gap:5px;margin-bottom:10px;flex-wrap:wrap}
+.set-tab{display:inline-flex;align-items:center;gap:3px;padding:4px 11px;border:1px solid var(--border);border-radius:18px;background:var(--card);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.set-tab:hover{border-color:var(--p);color:var(--p)}
+.set-tab.active{background:var(--p);color:#fff;border-color:var(--p)}
+.set-tab-icon{font-size:9px;opacity:.6;cursor:pointer}.set-tab-icon:hover{opacity:1}
+/* WORD LIST */
+.witem{display:flex;align-items:flex-start;gap:9px;padding:11px 12px;border:1px solid var(--border);border-radius:9px;margin-bottom:6px;background:var(--card)}
+.witem-main{flex:1;min-width:0}
+.witem-setlbl{font-size:10px;color:var(--muted);margin-bottom:1px}
+.witem-word{font-size:14px;font-weight:700}
+.witem-syn{font-size:11px;color:#065f46;margin-top:3px}
+.witem-ant{font-size:11px;color:#991b1b;margin-top:2px}
+.witem-note{font-size:10px;color:var(--muted);margin-top:2px}
+.witem-kor{font-size:11px;color:#1e40af;margin-top:2px}
+.witem-eng{font-size:11px;color:#78350f;margin-top:2px;font-style:italic}
+.badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;margin-right:3px}
+.bs{background:#d1fae5;color:#065f46}.ba{background:#fee2e2;color:#991b1b}
+.witem-acts{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+/* FORM */
+.fg{margin-bottom:10px}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.fi{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;transition:border .15s;background:#fff;color:var(--text)}
+.fi:focus{border-color:var(--p)}
+/* FLASHCARD */
+.fc-wrap{perspective:1000px;height:230px;margin:12px 0;cursor:pointer;user-select:none}
+.fc{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,.2,.2,1)}
+.fc.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.fc-front{background:linear-gradient(135deg,var(--p),var(--teal));color:#fff}
+.fc-back{background:var(--card);border:2px solid var(--border);transform:rotateY(180deg);overflow-y:auto;align-items:flex-start!important;justify-content:flex-start!important}
+.fc-word{font-size:30px;font-weight:800;text-align:center}
+.fc-hint{font-size:11px;opacity:.6;margin-top:8px}
+.fc-nav{display:flex;align-items:center;justify-content:center;gap:12px}
+.fc-cnt{font-size:12px;color:var(--muted);min-width:55px;text-align:center}
+.fc-sec{width:100%;margin:5px 0}
+.fc-sec h4{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-bottom:4px}
+.fc-sec.syn h4{color:#059669}.fc-sec.ant h4{color:#dc2626}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{padding:3px 8px;border-radius:13px;font-size:12px;font-weight:500}
+.tsyn{background:#d1fae5;color:#065f46}.tant{background:#fee2e2;color:#991b1b}
+.fc-prog{height:3px;background:rgba(255,255,255,.3);border-radius:2px;width:100%;margin-top:8px}
+.fc-prog-fill{height:100%;background:#fff;border-radius:2px;transition:width .3s}
+/* QUIZ */
+.qpbar{height:5px;background:var(--border);border-radius:3px;margin-bottom:14px;overflow:hidden}
+.qpbar-fill{height:100%;background:linear-gradient(90deg,var(--p),var(--teal));border-radius:3px;transition:width .3s}
+.qtype{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.qtype.syn{color:#059669}.qtype.ant{color:#dc2626}
+.qword{font-size:24px;font-weight:800;margin-bottom:4px}
+.qprompt{font-size:12px;color:var(--muted);margin-bottom:16px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.choice{padding:11px 13px;border:2px solid var(--border);border-radius:9px;background:var(--card);font-size:13px;cursor:pointer;transition:all .13s;text-align:left;font-weight:500}
+.choice:hover:not(:disabled){border-color:var(--p);background:#eef2ff}
+.choice.correct{border-color:var(--ok)!important;background:#d1fae5!important;color:#065f46!important}
+.choice.wrong{border-color:var(--err)!important;background:#fee2e2!important;color:#991b1b!important}
+.choice:disabled{cursor:default}
+.quiz-next{margin-top:13px;width:100%;justify-content:center}
+/* RESULT */
+.result{text-align:center;padding:26px 14px}
+.result-pct{font-size:56px;font-weight:900;background:linear-gradient(135deg,var(--p),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.result-sub{font-size:13px;color:var(--muted);margin-top:3px}
+.result-msg{font-size:17px;font-weight:700;margin:13px 0}
+.result-actions{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.ritem{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:6px;font-size:12px}
+.ritem-word{font-weight:700;font-size:13px;margin-bottom:2px}
+/* EXAM CREATE */
+.ex-sec{margin-bottom:16px}
+.ex-sec-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.ex-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ex-type-btn{border:2px solid var(--border);border-radius:9px;padding:11px 8px;text-align:center;cursor:pointer;background:var(--card);transition:all .15s;font-size:12px;font-weight:600}
+.ex-type-btn:hover{border-color:var(--p)}
+.ex-type-btn.active{border-color:var(--p);background:#eef2ff;color:var(--p)}
+.ex-type-icon{font-size:20px;margin-bottom:3px}
+.set-check-row{display:flex;flex-wrap:wrap;gap:5px}
+.set-check{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--border);border-radius:14px;background:var(--card);cursor:pointer;font-size:11px;font-weight:600;transition:all .15s}
+.set-check input{accent-color:var(--p)}
+.set-check:has(input:checked){background:#eef2ff;border-color:var(--p);color:var(--p)}
+.share-input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:11px;background:#f8fafc;color:var(--muted);font-family:monospace}
+/* EXAM TAKE */
+.et-header{background:linear-gradient(135deg,var(--p),var(--teal));color:#fff;border-radius:12px;padding:18px;margin-bottom:16px;text-align:center}
+.et-title{font-size:20px;font-weight:800}
+.et-meta{font-size:12px;opacity:.8;margin-top:3px}
+.et-q{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:10px}
+.et-qnum{font-size:10px;font-weight:700;color:var(--p);margin-bottom:3px}
+.et-qkind{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-bottom:3px}
+.et-qkind.syn{color:#059669}.et-qkind.ant{color:#dc2626}
+.et-qword{font-size:19px;font-weight:800;margin-bottom:10px}
+.et-choices{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.et-choice{padding:10px 12px;border:2px solid var(--border);border-radius:8px;background:var(--card);font-size:13px;cursor:pointer;transition:all .13s;text-align:left;font-weight:500}
+.et-choice:hover:not(.locked){border-color:var(--p);background:#eef2ff}
+.et-choice.sel{border-color:var(--p);background:#eef2ff}
+.et-choice.correct{border-color:var(--ok)!important;background:#d1fae5!important;color:#065f46!important}
+.et-choice.wrong{border-color:var(--err)!important;background:#fee2e2!important;color:#991b1b!important}
+.et-choice.locked{cursor:default}
+.et-inp{width:100%;padding:9px 11px;border:2px solid var(--border);border-radius:8px;font-size:14px;outline:none}
+.et-inp:focus{border-color:var(--p)}
+.et-inp.correct{border-color:var(--ok);background:#d1fae5}
+.et-inp.wrong{border-color:var(--err);background:#fee2e2}
+.et-result{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:26px;text-align:center;margin-bottom:12px}
+.et-rpct{font-size:54px;font-weight:900;background:linear-gradient(135deg,var(--p),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+/* BULK */
+.bulk-ta{width:100%;min-height:150px;padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:monospace;outline:none;resize:vertical;line-height:1.6;color:var(--text);background:#fff}
+.bulk-ta:focus{border-color:var(--p)}
+.plist{max-height:200px;overflow-y:auto;margin-top:9px}
+.prow{display:flex;align-items:flex-start;gap:6px;padding:5px 8px;border-radius:6px;margin-bottom:3px;font-size:11px}
+.prow.ok{background:#f0fdf4;border:1px solid #bbf7d0}
+.prow.err{background:#fff1f2;border:1px solid #fecdd3}
+.prow-num{font-weight:700;min-width:16px;color:var(--muted)}
+.prow-word{font-weight:700;min-width:65px}
+.prow-err{color:var(--err);font-size:10px}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:13px}
+.modal{background:var(--card);border-radius:13px;padding:18px;width:100%;max-width:460px;max-height:92vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:14px}
+.modal-acts{display:flex;gap:6px;justify-content:flex-end;margin-top:14px}
+/* MISC */
+.empty{text-align:center;padding:34px 14px;color:var(--muted)}
+.empty-icon{font-size:36px;margin-bottom:8px}
+.sec-title{font-size:15px;font-weight:700;margin-bottom:11px}
+.hidden{display:none!important}
+.tip{font-size:11px;color:var(--muted);background:#f8fafc;border:1px solid var(--border);border-radius:7px;padding:7px 10px;margin-bottom:10px}
+/* SEARCH */
+.search-bar{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+.search-input{flex:1;padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;background:#fff;color:var(--text)}
+.search-input:focus{border-color:var(--p)}
+.search-filter{padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:#fff;cursor:pointer;outline:none;color:var(--text)}
+.search-count{font-size:11px;color:var(--muted);margin-bottom:10px;padding:0 3px}
+mark.hi{background:#fef08a;color:#854d0e;padding:0 2px;border-radius:2px;font-weight:700}
+/* SET META */
+.set-tab-meta{font-size:9px;font-weight:500;opacity:.7;margin-left:1px}
+/* TEXTBOOK COLORS (출판사별 세트 색상) */
+.tb-ybm{background:#dbeafe!important;color:#1e40af!important;border-color:#93c5fd!important}
+.tb-ybm.active{background:#2563eb!important;color:#fff!important;border-color:#2563eb!important}
+.tb-chunjae{background:#fee2e2!important;color:#991b1b!important;border-color:#fca5a5!important}
+.tb-chunjae.active{background:#dc2626!important;color:#fff!important;border-color:#dc2626!important}
+.tb-neung{background:#fef3c7!important;color:#92400e!important;border-color:#fcd34d!important}
+.tb-neung.active{background:#d97706!important;color:#fff!important;border-color:#d97706!important}
+.tb-geum{background:#d1fae5!important;color:#065f46!important;border-color:#86efac!important}
+.tb-geum.active{background:#059669!important;color:#fff!important;border-color:#059669!important}
+.tb-visang{background:#ede9fe!important;color:#5b21b6!important;border-color:#c4b5fd!important}
+.tb-visang.active{background:#7c3aed!important;color:#fff!important;border-color:#7c3aed!important}
+.tb-mirae{background:#fce7f3!important;color:#9f1239!important;border-color:#f9a8d4!important}
+.tb-mirae.active{background:#db2777!important;color:#fff!important;border-color:#db2777!important}
+/* PRESETS */
+.preset-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;padding:7px 8px;background:#f8fafc;border-radius:7px;border:1px solid var(--border)}
+.preset-row + .preset-row{margin-top:-4px}
+.preset-section{width:100%;font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
+.preset-btn{font-size:10px;padding:3px 8px;border:1px solid var(--border);border-radius:12px;background:#fff;cursor:pointer;font-weight:600;color:var(--text);transition:all .15s}
+.preset-btn:hover{background:var(--p);color:#fff;border-color:var(--p)}
+.preset-btn.active{background:var(--p);color:#fff;border-color:var(--p)}
+.fg-row{display:flex;gap:6px}
+.fg-row > .fg{flex:1}
+@media(max-width:480px){
+  .mode-grid{grid-template-columns:1fr}
+  .choices,.et-choices{grid-template-columns:1fr}
+  .fc-word{font-size:24px}
+  .ex-type-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-logo">📚 유의어·반의어</span>
+  <button class="nav-btn active" id="nb-home"  onclick="goHome()">홈</button>
+  <button class="nav-btn"        id="nb-words" onclick="goWords()">단어장</button>
+  <button class="nav-btn"        id="nb-exam"  onclick="goExam()">시험출제</button>
+</nav>
+
+<!-- ═══ HOME ═══ -->
+<div id="pg-home" class="page on">
+  <div class="stat-row">
+    <div class="stat"><div class="stat-n" id="s-words">0</div><div class="stat-l">단어 수</div></div>
+    <div class="stat"><div class="stat-n" id="s-quiz">0</div><div class="stat-l">퀴즈 완료</div></div>
+    <div class="stat"><div class="stat-n" id="s-best">-</div><div class="stat-l">최고 점수</div></div>
+  </div>
+  <div id="home-load-status" style="display:none;text-align:center;font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px;background:var(--card);border:1px solid var(--border);border-radius:8px"></div>
+  <div class="mode-grid">
+    <div class="mode-btn" onclick="goFlashcard()"><div class="mode-icon">🃏</div><div class="mode-name">플래시카드</div><div class="mode-sub">앞/뒤 넘기며 학습</div></div>
+    <div class="mode-btn" onclick="goQuizPage()"><div class="mode-icon">✏️</div><div class="mode-name">객관식 퀴즈</div><div class="mode-sub">실력 점수 확인</div></div>
+  </div>
+  <div style="text-align:center;margin-top:14px">
+    <button class="btn btn-o btn-sm" onclick="loadWordsJson(true)">🔄 단어 다시 불러오기</button>
+  </div>
+</div>
+
+<!-- ═══ WORDS ═══ -->
+<div id="pg-words" class="page">
+  <div class="btn-row">
+    <button class="btn btn-p" onclick="openAdd()">＋ 단어 추가</button>
+    <button class="btn btn-p" style="background:#7c3aed" onclick="openBulk()">📋 일괄 추가</button>
+    <button class="btn btn-o" onclick="openCardPrint()">🃏 카드 인쇄</button>
+    <button class="btn btn-o" onclick="doExport()">⬇ 내보내기</button>
+    <label class="btn btn-o" style="cursor:pointer" title="JSON 또는 CSV 파일 (.json, .csv)">⬆ 불러오기<input type="file" accept=".json,.csv" onchange="doImport(event)" class="hidden"></label>
+    <button class="btn btn-o" style="color:var(--err)" onclick="clearAll()">🗑 전체삭제</button>
+  </div>
+  <div id="sets-bar" class="sets-bar"></div>
+  <div class="search-bar">
+    <input id="search-input" class="search-input" placeholder="🔍 단어/뜻/메모 통합 검색..." oninput="renderList()">
+    <select id="search-scope" class="search-filter" onchange="renderList()">
+      <option value="all">전체필드</option>
+      <option value="word">단어만</option>
+      <option value="syn">유의어</option>
+      <option value="ant">반의어</option>
+      <option value="kor">한글 뜻</option>
+      <option value="eng">영영 풀이</option>
+      <option value="note">메모</option>
+    </select>
+    <button class="btn btn-o btn-sm" onclick="clearSearch()" title="검색 초기화">✕</button>
+  </div>
+  <div id="search-count" class="search-count"></div>
+  <div id="word-list"></div>
+</div>
+
+<!-- ═══ FLASHCARD ═══ -->
+<div id="pg-fc" class="page">
+  <div class="btn-row">
+    <button class="btn btn-o btn-sm" onclick="goHome()">← 홈</button>
+    <select id="fc-set" class="fi" style="width:auto;padding:4px 8px;font-size:11px" onchange="initFC()"></select>
+    <select id="fc-filter" class="fi" style="width:auto;padding:4px 8px;font-size:11px" onchange="initFC()">
+      <option value="all">전체</option><option value="syn">유의어만</option><option value="ant">반의어만</option>
+    </select>
+    <button class="btn btn-o btn-sm" onclick="shuffleFC()">🔀 섞기</button>
+  </div>
+  <div id="fc-empty" class="empty hidden"><div class="empty-icon">📭</div><div>단어를 먼저 추가해주세요!</div></div>
+  <div id="fc-body">
+    <div class="fc-wrap" onclick="flipFC()">
+      <div class="fc" id="fc-card">
+        <div class="fc-face fc-front">
+          <div id="fc-word" class="fc-word">—</div>
+          <div class="fc-hint">클릭 또는 스페이스바로 뒤집기</div>
+          <div class="fc-prog"><div class="fc-prog-fill" id="fc-pfill"></div></div>
+        </div>
+        <div class="fc-face fc-back" style="padding:16px">
+          <div style="width:100%">
+            <div style="font-size:16px;font-weight:800;margin-bottom:9px" id="fc-bword">—</div>
+            <div class="fc-sec syn" id="fc-syn-sec"><h4>유의어 (Synonyms)</h4><div class="tags" id="fc-syn-tags"></div></div>
+            <div class="fc-sec ant" id="fc-ant-sec" style="margin-top:9px"><h4>반의어 (Antonyms)</h4><div class="tags" id="fc-ant-tags"></div></div>
+            <div id="fc-kor-sec" style="margin-top:9px"><h4 style="font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-bottom:3px;color:#1d4ed8">한글 뜻</h4><div id="fc-kor" style="font-size:13px;color:#1e40af"></div></div>
+            <div id="fc-eng-sec" style="margin-top:7px"><h4 style="font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-bottom:3px;color:#92400e">영영 풀이</h4><div id="fc-eng" style="font-size:12px;color:#78350f;font-style:italic;line-height:1.5"></div></div>
+            <div id="fc-note-wrap" style="margin-top:7px;font-size:11px;color:var(--muted)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-o" onclick="fcPrev()">← 이전</button>
+      <span class="fc-cnt" id="fc-cnt">0 / 0</span>
+      <button class="btn btn-o" onclick="fcNext()">다음 →</button>
+    </div>
+    <div class="tip" style="margin-top:9px">💡 키보드: ← → 이동 &nbsp;|&nbsp; 스페이스 뒤집기</div>
+  </div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<div id="pg-quiz" class="page">
+  <div id="q-setup">
+    <div class="card">
+      <div class="sec-title">퀴즈 설정</div>
+      <div class="fg"><label class="fl">세트</label><select id="q-set" class="fi"></select></div>
+      <div class="fg"><label class="fl">문제 수</label>
+        <select id="q-count" class="fi"><option value="5">5문제</option><option value="10" selected>10문제</option><option value="20">20문제</option><option value="0">전체</option></select></div>
+      <div class="fg"><label class="fl">유형</label>
+        <select id="q-type" class="fi"><option value="both">유의어 + 반의어 섞기</option><option value="syn">유의어만</option><option value="ant">반의어만</option></select></div>
+      <button class="btn btn-p btn-full" onclick="startQuiz()">시작하기 →</button>
+    </div>
+    <button class="btn btn-o" onclick="goHome()">← 홈</button>
+  </div>
+  <div id="q-play" class="hidden">
+    <div class="qpbar"><div class="qpbar-fill" id="q-pbar" style="width:0%"></div></div>
+    <div class="card">
+      <div class="qtype" id="q-type-lbl"></div>
+      <div class="qword" id="q-word"></div>
+      <div class="qprompt" id="q-prompt"></div>
+      <div class="choices" id="q-choices"></div>
+      <button class="btn btn-p quiz-next hidden" id="q-next" onclick="nextQ()">다음 →</button>
+    </div>
+    <button class="btn btn-o btn-sm" onclick="quitQuiz()">그만하기</button>
+  </div>
+  <div id="q-result" class="hidden">
+    <div class="card result">
+      <div class="result-pct" id="r-pct">0%</div>
+      <div class="result-sub" id="r-sub"></div>
+      <div class="result-msg" id="r-msg"></div>
+      <div class="result-actions"><button class="btn btn-p" onclick="startQuiz()">다시 풀기</button><button class="btn btn-o" onclick="goHome()">홈으로</button></div>
+    </div>
+    <div id="q-review"></div>
+  </div>
+</div>
+
+<!-- ═══ EXAM CREATE ═══ -->
+<div id="pg-exam" class="page">
+  <div class="sec-title">📝 시험 출제</div>
+  <div class="card">
+    <div class="ex-sec">
+      <div class="ex-sec-title">시험 제목</div>
+      <input id="ex-title" class="fi" value="유의어·반의어 시험" placeholder="예: 1단원 시험">
+    </div>
+    <div class="ex-sec">
+      <div class="ex-sec-title">세트 선택</div>
+      <div id="ex-set-checks" class="set-check-row"></div>
+    </div>
+    <div class="ex-sec">
+      <div class="ex-sec-title">문제 유형</div>
+      <div class="ex-type-grid">
+        <div class="ex-type-btn active" id="et-mcq" onclick="setExamType('mcq')"><div class="ex-type-icon">🔘</div>객관식</div>
+        <div class="ex-type-btn" id="et-written" onclick="setExamType('written')"><div class="ex-type-icon">✍️</div>주관식</div>
+        <div class="ex-type-btn" id="et-match" onclick="setExamType('match')"><div class="ex-type-icon">🔗</div>매칭 (인쇄용)</div>
+      </div>
+    </div>
+    <div class="ex-sec" id="ex-cnt-row">
+      <div class="ex-sec-title">문제 수</div>
+      <select id="ex-count" class="fi"><option value="5">5문제</option><option value="10" selected>10문제</option><option value="20">20문제</option><option value="0">전체</option></select>
+    </div>
+    <div class="ex-sec">
+      <div class="ex-sec-title">유의어 / 반의어</div>
+      <select id="ex-kind" class="fi"><option value="both">유의어 + 반의어 섞기</option><option value="syn">유의어만</option><option value="ant">반의어만</option></select>
+    </div>
+    <div class="ex-sec">
+      <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer">
+        <input type="checkbox" id="ex-ans" style="accent-color:var(--p);width:14px;height:14px"> 정답지 포함 (인쇄용)
+      </label>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn btn-p" onclick="previewExam()">👁 미리보기</button>
+      <button class="btn btn-ok" onclick="printExam()">🖨 인쇄하기</button>
+      <button class="btn btn-p" style="background:#7c3aed" onclick="shareExam()">🔗 공유 링크</button>
+    </div>
+    <div id="ex-share-wrap" class="hidden" style="margin-top:10px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px" id="ex-share-desc">학생에게 아래 링크를 공유하세요:</div>
+      <div id="ex-share-links"></div>
+    </div>
+  </div>
+  <div id="ex-preview-wrap" class="hidden">
+    <div style="font-weight:700;font-size:13px;margin-bottom:7px">미리보기</div>
+    <div style="border:2px solid var(--border);border-radius:9px;background:var(--bg);padding:12px;max-height:300px;overflow-y:auto" id="ex-preview"></div>
+  </div>
+</div>
+
+<!-- ═══ EXAM TAKE (student) ═══ -->
+<div id="pg-exam-take" class="page">
+  <div class="et-header"><div class="et-title" id="et-title">시험</div><div class="et-meta" id="et-meta"></div></div>
+  <div id="et-questions"></div>
+  <div style="text-align:center;margin:18px 0">
+    <button class="btn btn-p" style="padding:11px 30px;font-size:14px" id="et-submit-btn" onclick="submitExam()">제출하기</button>
+  </div>
+  <div id="et-result" class="hidden">
+    <div class="et-result">
+      <div class="et-rpct" id="et-rpct">0%</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:3px" id="et-rsub"></div>
+      <div style="font-size:17px;font-weight:700;margin:12px 0" id="et-rmsg"></div>
+      <button class="btn btn-o" onclick="location.hash=''">← 처음으로</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD/EDIT MODAL ═══ -->
+<div id="modal-bg" class="modal-bg hidden" onclick="bgClose(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modal-title">단어 추가</div>
+    <div class="fg"><label class="fl">세트</label><select id="m-set" class="fi"></select></div>
+    <div class="fg">
+      <label class="fl">영어 단어</label>
+      <div style="display:flex;gap:5px">
+        <input id="m-word" class="fi" placeholder="예: happy" autocomplete="off" style="flex:1">
+        <button class="btn btn-o btn-sm" id="auto-btn" onclick="autoFill()" style="display:none">🔍 자동</button>
+      </div>
+      <div id="auto-status" style="font-size:10px;color:var(--muted);margin-top:3px"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px">
+      <span style="font-size:11px;color:var(--muted);font-weight:600">입력 방식</span>
+      <label style="display:flex;align-items:center;gap:3px;font-size:11px;cursor:pointer"><input type="radio" name="imode" value="manual" checked onchange="setMode('manual')"> 수동</label>
+      <label style="display:flex;align-items:center;gap:3px;font-size:11px;cursor:pointer"><input type="radio" name="imode" value="auto" onchange="setMode('auto')"> 자동 (인터넷)</label>
+    </div>
+    <div class="fg"><label class="fl">유의어 (쉼표로 구분)</label><input id="m-syn" class="fi" placeholder="예: joyful, cheerful, glad"></div>
+    <div class="fg"><label class="fl">반의어 (쉼표로 구분)</label><input id="m-ant" class="fi" placeholder="예: sad, miserable, gloomy"></div>
+    <div class="fg"><label class="fl">메모 (선택)</label><input id="m-note" class="fi" placeholder="예: 감정 형용사, 1과 본문"></div>
+    <div class="fg" style="display:flex;gap:5px;align-items:flex-end">
+      <div style="flex:1">
+        <label class="fl">한글 뜻 (선택)</label>
+        <input id="m-kor" class="fi" placeholder="예: 행복한, 기쁜">
+      </div>
+    </div>
+    <div class="fg" style="display:flex;gap:5px;align-items:flex-end">
+      <div style="flex:1">
+        <label class="fl">영영 풀이 (선택)</label>
+        <input id="m-eng" class="fi" placeholder="예: feeling or showing pleasure or contentment">
+      </div>
+      <button class="btn btn-o btn-sm" id="auto-eng-btn" onclick="autoFillEng()" style="display:none" title="Free Dictionary API에서 영영풀이 가져오기">🔍 영영</button>
+    </div>
+    <div class="modal-acts">
+      <button class="btn btn-o" onclick="closeModal()">취소</button>
+      <button class="btn btn-p" onclick="saveWord()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BULK MODAL ═══ -->
+<div id="bulk-bg" class="modal-bg hidden" onclick="if(event.target===this)closeBulk()">
+  <div class="modal" style="max-width:520px" onclick="event.stopPropagation()">
+    <div class="modal-title">📋 일괄 추가</div>
+    <div class="fg"><label class="fl">저장할 세트</label><select id="bulk-set" class="fi"></select></div>
+    <div class="tip"><strong>형식 (한 줄에 한 단어):</strong><br><code style="background:#e2e8f0;padding:1px 4px;border-radius:3px;display:inline-block;margin-top:3px">단어 | 유의어 | 반의어 | 메모 | 한글뜻 | 영영풀이</code><br><span style="color:#059669;font-size:10px;display:block;margin-top:3px">예) happy | joyful, cheerful | sad, gloomy | 감정 형용사 | 행복한 | feeling or showing pleasure</span><br><span style="color:#0891b2;font-size:10px;display:block;margin-top:3px">💡 쉼표가 들어가는 값은 큰따옴표로 감싸세요: <code>"joyful, glad"</code></span></div>
+    <textarea id="bulk-ta" class="bulk-ta" placeholder="happy | joyful, cheerful | sad, gloomy&#10;angry | furious, mad | calm, peaceful" oninput="previewBulk()"></textarea>
+    <div id="bulk-preview"></div>
+    <div class="modal-acts">
+      <button class="btn btn-o" onclick="closeBulk()">취소</button>
+      <button class="btn btn-p" id="bulk-save-btn" onclick="saveBulk()" disabled>저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CARD PRINT MODAL ═══ -->
+<div id="card-modal-bg" class="modal-bg hidden" onclick="if(event.target===this)closeCardModal()">
+  <div class="modal" style="max-width:380px" onclick="event.stopPropagation()">
+    <div class="modal-title">🃏 단어 카드 인쇄</div>
+    <div class="fg"><label class="fl">세트</label><select id="card-set" class="fi"></select></div>
+    <div class="fg">
+      <label class="fl">카드 레이아웃</label>
+      <select id="card-cols" class="fi">
+        <option value="2">2열 (크게)</option>
+        <option value="3" selected>3열 (보통)</option>
+        <option value="4">4열 (작게)</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">카드 형식</label>
+      <select id="card-style" class="fi">
+        <option value="full">앞뒤 한 장 (단어 + 유의어/반의어)</option>
+        <option value="front">앞면만 (단어)</option>
+        <option value="split">앞면 / 뒷면 분리 인쇄</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
+        <input type="checkbox" id="card-note" style="accent-color:var(--p);width:13px;height:13px" checked> 메모 포함
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-top:4px">
+        <input type="checkbox" id="card-kor" style="accent-color:var(--p);width:13px;height:13px"> 한글 뜻 포함
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-top:4px">
+        <input type="checkbox" id="card-eng" style="accent-color:var(--p);width:13px;height:13px"> 영영 풀이 포함
+      </label>
+    </div>
+    <div class="modal-acts">
+      <button class="btn btn-o" onclick="closeCardModal()">취소</button>
+      <button class="btn btn-ok" onclick="printCards()">🖨 인쇄하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SET NAME MODAL ═══ -->
+<div id="set-modal-bg" class="modal-bg hidden" onclick="if(event.target===this)closeSetModal()">
+  <div class="modal" style="max-width:480px" onclick="event.stopPropagation()">
+    <div class="modal-title" id="set-modal-title">새 세트 추가</div>
+
+    <div id="set-presets">
+      <div class="preset-row">
+        <span class="preset-section">📚 빠른 교과서 선택</span>
+        <button class="preset-btn" data-grade="고1" data-pub="천재교육" data-author="민병천" data-textbook="공통영어 1" onclick="applyPreset(this)">고1 공통영어 1 (천재/민)</button>
+        <button class="preset-btn" data-grade="고1" data-pub="YBM" data-author="박준언" data-textbook="공통영어 1" onclick="applyPreset(this)">고1 공통영어 1 (YBM/박)</button>
+        <button class="preset-btn" data-grade="고2" data-pub="천재교육" data-author="조수경" data-textbook="영어 Ⅰ" onclick="applyPreset(this)">고2 영어 Ⅰ (천재/조)</button>
+        <button class="preset-btn" data-grade="고2" data-pub="YBM" data-author="박준언" data-textbook="영어 Ⅰ" onclick="applyPreset(this)">고2 영어 Ⅰ (YBM/박)</button>
+      </div>
+    </div>
+
+    <div class="fg"><label class="fl">세트 이름 (선택)</label><input id="set-name-inp" class="fi" placeholder="비워두면 자동 생성됩니다"></div>
+
+    <div class="fg-row">
+      <div class="fg">
+        <label class="fl">학년</label>
+        <select id="set-grade" class="fi" onchange="autoNameSet()">
+          <option value="">- 선택 -</option>
+          <option value="고1">고1</option>
+          <option value="고2">고2</option>
+          <option value="고3">고3</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">출판사</label>
+        <select id="set-pub" class="fi" onchange="autoNameSet()">
+          <option value="">- 선택 -</option>
+          <option value="천재교육">천재교육</option>
+          <option value="YBM">YBM</option>
+          <option value="능률">능률</option>
+          <option value="금성">금성</option>
+          <option value="비상">비상</option>
+          <option value="미래엔">미래엔</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fg-row">
+      <div class="fg">
+        <label class="fl">교과서명</label>
+        <input id="set-textbook" class="fi" placeholder="예: All-E Together Ⅱ" oninput="autoNameSet()">
+      </div>
+      <div class="fg" style="max-width:120px">
+        <label class="fl">저자</label>
+        <input id="set-author" class="fi" placeholder="예: 조수경" oninput="autoNameSet()">
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl">단원</label>
+      <input id="set-unit" class="fi" placeholder="예: 1과 / 1단원 / Lesson 1" oninput="autoNameSet()">
+    </div>
+
+    <div class="modal-acts">
+      <button class="btn btn-o" onclick="closeSetModal()">취소</button>
+      <button class="btn btn-p" onclick="saveSet()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+let SETS = JSON.parse(localStorage.getItem('sa_sets') || '[{"id":"default","name":"기본 단어장","type":"custom","publisher":"","grade":"","author":"","textbook":"","unit":""}]');
+let W    = JSON.parse(localStorage.getItem('sa_words') || '[]');
+let ST   = JSON.parse(localStorage.getItem('sa_stats') || '{"done":0,"best":0}');
+W.forEach(w => { if (!w.setId) w.setId = 'default'; });
+
+// 출판사별 색상 클래스 매핑 (영문 클래스명으로 안전하게)
+const PUB_CLASS = {
+  '천재교육': 'tb-chunjae', '천재': 'tb-chunjae',
+  'YBM': 'tb-ybm', '영진': 'tb-ybm',
+  '능률': 'tb-neung',
+  '금성': 'tb-geum', '교학사': 'tb-geum',
+  '비상': 'tb-visang', '홍익': 'tb-visang',
+  '미래엔': 'tb-mirae', '대한': 'tb-mirae'
+};
+function pubClass(pub) { return PUB_CLASS[pub] || ''; }
+
+let qQs=[], qIdx=0, qScore=0, qDone=false;
+let fcList=[], fcIdx=0;
+let editId=null, curSet='all', editSetId=null;
+let examType='mcq', examBuilt=null;
+let bulkParsed=[];
+let etQs=[], etSubmitted=false;
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const persist = () => { localStorage.setItem('sa_sets',JSON.stringify(SETS)); localStorage.setItem('sa_words',JSON.stringify(W)); localStorage.setItem('sa_stats',JSON.stringify(ST)); };
+const tags = s => s.split(',').map(x=>x.trim()).filter(Boolean);
+const shuffle = a => { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]]} return b; };
+const esc = s => { const d=document.createElement('div');d.textContent=s;return d.innerHTML; };
+// 검색어 하이라이트 (HTML 안전)
+const hl = (text, query) => {
+  const safe = esc(text);
+  if (!query) return safe;
+  try {
+    const re = new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')+')','gi');
+    return safe.replace(re, '<mark class="hi">$1</mark>');
+  } catch { return safe; }
+};
+// 검색어가 단어에 매치되는지 확인
+const matchesSearch = (w, q, scope) => {
+  if (!q) return true;
+  q = q.toLowerCase();
+  const inText = s => s && s.toLowerCase().includes(q);
+  switch(scope) {
+    case 'word': return inText(w.word);
+    case 'syn':  return w.synonyms.some(inText);
+    case 'ant':  return w.antonyms.some(inText);
+    case 'kor':  return inText(w.kor);
+    case 'eng':  return inText(w.eng);
+    case 'note': return inText(w.note);
+    default: return inText(w.word) || w.synonyms.some(inText) || w.antonyms.some(inText) || inText(w.kor) || inText(w.eng) || inText(w.note);
+  }
+};
+const setName = id => SETS.find(x=>x.id===id)?.name || '알 수 없음';
+const wordsFor = id => id==='all' ? W : W.filter(w=>w.setId===id);
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function show(id) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('on')); document.getElementById(id).classList.add('on'); }
+function setNav(id) { ['nb-home','nb-words','nb-exam'].forEach(b=>document.getElementById(b)?.classList.remove('active')); document.getElementById(id)?.classList.add('active'); }
+
+function goHome()  { show('pg-home');  setNav('nb-home');  updateHome(); }
+function goWords() { show('pg-words'); setNav('nb-words'); renderSetsBar(); renderList(); }
+function goFlashcard() {
+  if(!W.length){ alert('단어를 먼저 추가해주세요!'); return; }
+  show('pg-fc'); fillSelect('fc-set', true); initFC();
+}
+function goQuizPage() {
+  if(W.length<4){ alert('퀴즈를 위해 최소 4개 단어가 필요합니다.'); return; }
+  show('pg-quiz'); fillSelect('q-set', true);
+  ['q-setup'].forEach(id=>document.getElementById(id).classList.remove('hidden'));
+  ['q-play','q-result'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+}
+function goExam() {
+  show('pg-exam'); setNav('nb-exam');
+  renderExamSetChecks();
+  document.getElementById('ex-preview-wrap').classList.add('hidden');
+  document.getElementById('ex-share-wrap').classList.add('hidden');
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────
+function updateHome() {
+  document.getElementById('s-words').textContent = W.length;
+  document.getElementById('s-quiz').textContent  = ST.done;
+  document.getElementById('s-best').textContent  = ST.best ? ST.best+'%' : '-';
+}
+
+// ── SET MANAGEMENT ────────────────────────────────────────────────────────
+function renderSetsBar() {
+  const bar = document.getElementById('sets-bar');
+  bar.innerHTML =
+    `<button class="set-tab${curSet==='all'?' active':''}" onclick="selectSet('all')">전체 (${W.length})</button>` +
+    SETS.map(s => {
+      const cnt = W.filter(w=>w.setId===s.id).length;
+      const pc = pubClass(s.publisher);
+      const meta = s.unit ? `<span class="set-tab-meta">${esc(s.unit)}</span>` : '';
+      return `<button class="set-tab ${pc}${curSet===s.id?' active':''}" onclick="selectSet('${s.id}')" title="${esc(s.name)}${s.publisher?' · '+esc(s.publisher):''}">
+        ${esc(s.name)} (${cnt})${meta}
+        <span class="set-tab-icon" onclick="event.stopPropagation();openSetModal('${s.id}')" title="편집">✏️</span>
+        ${SETS.length>1?`<span class="set-tab-icon" onclick="event.stopPropagation();deleteSet('${s.id}')" title="삭제">✕</span>`:''}
+      </button>`;
+    }).join('') +
+    `<button class="btn btn-o btn-sm" onclick="openSetModal(null)">＋ 세트</button>`;
+}
+function selectSet(id) { curSet=id; renderSetsBar(); renderList(); }
+
+function fillSelect(selId, includeAll) {
+  const el = document.getElementById(selId);
+  const prev = el.value;
+  el.innerHTML = (includeAll ? '<option value="all">전체</option>' : '') +
+    SETS.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+  if ([...el.options].some(o=>o.value===prev)) el.value = prev;
+}
+
+function openSetModal(id) {
+  editSetId = id;
+  document.getElementById('set-modal-title').textContent = id ? '세트 편집' : '새 세트 추가';
+  const s = id ? (SETS.find(x=>x.id===id) || {}) : {};
+  document.getElementById('set-name-inp').value = s.name || '';
+  document.getElementById('set-grade').value = s.grade || '';
+  document.getElementById('set-pub').value = s.publisher || '';
+  document.getElementById('set-textbook').value = s.textbook || '';
+  document.getElementById('set-author').value = s.author || '';
+  document.getElementById('set-unit').value = s.unit || '';
+  // 새 세트일 때만 preset 표시
+  document.getElementById('set-presets').style.display = id ? 'none' : 'block';
+  // 기존 세트는 preset 강조 제거
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('set-modal-bg').classList.remove('hidden');
+  setTimeout(() => document.getElementById('set-name-inp').focus(), 50);
+}
+function closeSetModal() { document.getElementById('set-modal-bg').classList.add('hidden'); }
+
+function applyPreset(btn) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('set-grade').value = btn.dataset.grade || '';
+  document.getElementById('set-pub').value = btn.dataset.pub || '';
+  document.getElementById('set-textbook').value = btn.dataset.textbook || '';
+  document.getElementById('set-author').value = btn.dataset.author || '';
+  document.getElementById('set-unit').value = '';
+  autoNameSet();
+}
+
+function autoNameSet() {
+  const name = document.getElementById('set-name-inp').value.trim();
+  if (name) return; // 사용자가 직접 입력했으면 건드리지 않음
+  const grade = document.getElementById('set-grade').value;
+  const pub = document.getElementById('set-pub').value;
+  const book = document.getElementById('set-textbook').value;
+  const author = document.getElementById('set-author').value;
+  const unit = document.getElementById('set-unit').value;
+  let n = '';
+  if (grade) n += grade + ' ';
+  if (book) n += book + ' ';
+  else if (pub) n += pub + ' ';
+  if (author) n += '(' + author + ') ';
+  if (unit) n += unit;
+  n = n.trim();
+  document.getElementById('set-name-inp').value = n;
+}
+
+function saveSet() {
+  const customName = document.getElementById('set-name-inp').value.trim();
+  const grade = document.getElementById('set-grade').value;
+  const publisher = document.getElementById('set-pub').value;
+  const textbook = document.getElementById('set-textbook').value.trim();
+  const author = document.getElementById('set-author').value.trim();
+  const unit = document.getElementById('set-unit').value.trim();
+  // 이름 자동 생성
+  let name = customName;
+  if (!name) {
+    const parts = [];
+    if (grade) parts.push(grade);
+    if (textbook) parts.push(textbook);
+    else if (publisher) parts.push(publisher);
+    if (author) parts.push('('+author+')');
+    if (unit) parts.push(unit);
+    name = parts.join(' ') || '새 단어장';
+  }
+  if (editSetId) {
+    const s = SETS.find(x=>x.id===editSetId);
+    if (s) Object.assign(s, { name, grade, publisher, textbook, author, unit, type: publisher?'textbook':'custom' });
+  } else {
+    const id = uid();
+    SETS.push({ id, name, grade, publisher, textbook, author, unit, type: publisher?'textbook':'custom' });
+    curSet = id;
+  }
+  persist(); closeSetModal(); renderSetsBar(); renderList();
+}
+
+function deleteSet(id) {
+  const cnt = W.filter(w=>w.setId===id).length;
+  if (!confirm(cnt ? `이 세트에 ${cnt}개 단어가 있습니다. 삭제 시 기본 단어장으로 이동합니다. 계속할까요?` : '이 세트를 삭제할까요?')) return;
+  W.forEach(w => { if (w.setId===id) w.setId='default'; });
+  SETS = SETS.filter(s=>s.id!==id);
+  if (curSet===id) curSet='all';
+  persist(); renderSetsBar(); renderList();
+}
+
+// ── WORD LIST ─────────────────────────────────────────────────────────────
+function renderList() {
+  const el = document.getElementById('word-list');
+  const cntEl = document.getElementById('search-count');
+  const q = (document.getElementById('search-input')?.value || '').trim();
+  const scope = document.getElementById('search-scope')?.value || 'all';
+  const baseList = wordsFor(curSet);
+  const list = baseList.filter(w => matchesSearch(w, q, scope));
+
+  if (cntEl) {
+    if (q) cntEl.textContent = `🔍 "${q}" 검색결과: ${list.length} / ${baseList.length}개`;
+    else cntEl.textContent = baseList.length ? `총 ${baseList.length}개` : '';
+  }
+
+  if (!list.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">${q?'🔍':'📝'}</div><div>${q?'검색 결과가 없습니다.':(curSet==='all'?'단어가 없습니다.<br>＋ 단어 추가를 눌러 시작하세요!':'이 세트에 단어가 없습니다.')}</div></div>`;
+    return;
+  }
+  el.innerHTML = list.map(w => {
+    // search highlight 적용
+    const wordH = hl(w.word, q);
+    const synH = w.synonyms.length ? hl(w.synonyms.join(', '), q) : '';
+    const antH = w.antonyms.length ? hl(w.antonyms.join(', '), q) : '';
+    const korH = w.kor ? hl(w.kor, q) : '';
+    const engH = w.eng ? hl(w.eng, q) : '';
+    const noteH = w.note ? hl(w.note, q) : '';
+    return `
+    <div class="witem">
+      <div class="witem-main">
+        ${curSet==='all' ? `<div class="witem-setlbl">📁 ${esc(setName(w.setId))}</div>` : ''}
+        <div class="witem-word">${wordH}</div>
+        ${w.kor ? `<div class="witem-kor" style="margin-top:4px"><span class="badge" style="background:#dbeafe;color:#1e40af">뜻</span><span style="font-weight:600">${korH}</span></div>` : ''}
+        ${w.synonyms.length ? `<div class="witem-syn" style="margin-top:3px"><span class="badge bs">유의어</span>${synH}</div>` : ''}
+        ${w.antonyms.length ? `<div class="witem-ant" style="margin-top:2px"><span class="badge ba">반의어</span>${antH}</div>` : ''}
+        ${w.eng ? `<div class="witem-eng" style="margin-top:3px"><span class="badge" style="background:#fef3c7;color:#92400e">영영</span>${engH}</div>` : ''}
+        ${w.note ? `<div class="witem-note" style="margin-top:2px">📌 ${noteH}</div>` : ''}
+      </div>
+      <div class="witem-acts">
+        <button class="btn btn-o btn-sm" onclick="openEdit('${w.id}')">수정</button>
+        <button class="btn btn-danger btn-sm" onclick="delWord('${w.id}')">삭제</button>
+      </div>
+    </div>`;}).join('');
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-scope').value = 'all';
+  renderList();
+}
+
+// ── WORD MODAL ────────────────────────────────────────────────────────────
+function openAdd() {
+  editId = null;
+  document.getElementById('modal-title').textContent = '단어 추가';
+  ['m-word','m-syn','m-ant','m-note','m-kor','m-eng'].forEach(id => document.getElementById(id).value = '');
+  fillSelect('m-set', false);
+  document.getElementById('m-set').value = (curSet!=='all' ? curSet : SETS[0]?.id) || 'default';
+  document.querySelectorAll('input[name="imode"]')[0].checked = true;
+  setMode('manual');
+  document.getElementById('modal-bg').classList.remove('hidden');
+  setTimeout(() => document.getElementById('m-word').focus(), 50);
+}
+function openEdit(id) {
+  const w = W.find(x=>x.id===id); if (!w) return;
+  editId = id;
+  document.getElementById('modal-title').textContent = '단어 수정';
+  document.getElementById('m-word').value  = w.word;
+  document.getElementById('m-syn').value   = w.synonyms.join(', ');
+  document.getElementById('m-ant').value   = w.antonyms.join(', ');
+  document.getElementById('m-note').value  = w.note || '';
+  document.getElementById('m-kor').value   = w.kor  || '';
+  document.getElementById('m-eng').value   = w.eng  || '';
+  fillSelect('m-set', false);
+  document.getElementById('m-set').value = w.setId || 'default';
+  document.querySelectorAll('input[name="imode"]')[0].checked = true;
+  setMode('manual');
+  document.getElementById('modal-bg').classList.remove('hidden');
+}
+function closeModal() { document.getElementById('modal-bg').classList.add('hidden'); }
+function bgClose(e) { if (e.target===document.getElementById('modal-bg')) closeModal(); }
+
+function saveWord() {
+  const word = document.getElementById('m-word').value.trim();
+  if (!word) { alert('단어를 입력해주세요.'); return; }
+  const synonyms = tags(document.getElementById('m-syn').value);
+  const antonyms = tags(document.getElementById('m-ant').value);
+  if (!synonyms.length && !antonyms.length) { alert('유의어 또는 반의어를 최소 1개 입력해주세요.'); return; }
+  const note  = document.getElementById('m-note').value.trim();
+  const kor   = document.getElementById('m-kor').value.trim();
+  const eng   = document.getElementById('m-eng').value.trim();
+  const setId = document.getElementById('m-set').value;
+  if (editId) { const i=W.findIndex(w=>w.id===editId); W[i]={...W[i],word,synonyms,antonyms,note,kor,eng,setId}; }
+  else W.push({ id:uid(), word, synonyms, antonyms, note, kor, eng, setId });
+  persist(); closeModal(); renderSetsBar(); renderList();
+}
+function delWord(id) {
+  if (!confirm('이 단어를 삭제할까요?')) return;
+  W = W.filter(w=>w.id!==id); persist(); renderSetsBar(); renderList();
+}
+function clearAll() {
+  if (!W.length || !confirm('모든 단어를 삭제합니다. 계속할까요?')) return;
+  W = []; persist(); renderSetsBar(); renderList();
+}
+
+// ── AUTO FILL ─────────────────────────────────────────────────────────────
+function setMode(m) {
+  document.getElementById('auto-btn').style.display = m==='auto' ? 'inline-flex' : 'none';
+  document.getElementById('auto-eng-btn').style.display = m==='auto' ? 'inline-flex' : 'none';
+  document.getElementById('auto-status').textContent = m==='auto' ? '단어 입력 후 🔍 자동(유의어/반의어) 또는 🔍 영영 버튼을 클릭하세요.' : '';
+}
+async function autoFill() {
+  const word = document.getElementById('m-word').value.trim();
+  if (!word) { alert('단어를 먼저 입력해주세요.'); return; }
+  const btn = document.getElementById('auto-btn');
+  btn.disabled=true; btn.textContent='검색 중…';
+  try {
+    const [sr,ar] = await Promise.all([
+      fetch(`https://api.datamuse.com/words?rel_syn=${encodeURIComponent(word)}&max=8`),
+      fetch(`https://api.datamuse.com/words?rel_ant=${encodeURIComponent(word)}&max=8`)
+    ]);
+    const sd=await sr.json(), ad=await ar.json();
+    document.getElementById('m-syn').value = sd.map(x=>x.word).join(', ');
+    document.getElementById('m-ant').value = ad.map(x=>x.word).join(', ');
+    document.getElementById('auto-status').textContent = (!sd.length&&!ad.length) ? '결과를 찾지 못했습니다.' : `✅ 유의어 ${sd.length}개, 반의어 ${ad.length}개. 필요없는 단어는 삭제하세요.`;
+  } catch { document.getElementById('auto-status').textContent = '⚠️ 네트워크 오류.'; }
+  btn.disabled=false; btn.textContent='🔍 자동';
+}
+
+// Free Dictionary API에서 영영풀이 자동 가져오기
+async function autoFillEng() {
+  const word = document.getElementById('m-word').value.trim();
+  if (!word) { alert('단어를 먼저 입력해주세요.'); return; }
+  const btn = document.getElementById('auto-eng-btn');
+  btn.disabled=true; btn.textContent='...';
+  try {
+    const r = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    let def = '';
+    if (Array.isArray(data) && data.length) {
+      // 첫 번째 의미의 첫 번째 정의 우선
+      const meanings = data[0].meanings || [];
+      for (const m of meanings) {
+        if (m.definitions && m.definitions.length) {
+          def = m.definitions[0].definition;
+          break;
+        }
+      }
+    }
+    if (def) {
+      document.getElementById('m-eng').value = def;
+      document.getElementById('auto-status').textContent = '✅ 영영풀이를 가져왔습니다.';
+    } else {
+      document.getElementById('auto-status').textContent = '⚠️ 영영 정의를 찾지 못했습니다.';
+    }
+  } catch (e) {
+    document.getElementById('auto-status').textContent = '⚠️ 영영 가져오기 실패: '+e.message;
+  }
+  btn.disabled=false; btn.textContent='🔍 영영';
+}
+
+// ── BULK ADD ──────────────────────────────────────────────────────────────
+function openBulk() {
+  document.getElementById('bulk-ta').value = '';
+  document.getElementById('bulk-preview').innerHTML = '';
+  document.getElementById('bulk-save-btn').disabled = true;
+  bulkParsed = [];
+  fillSelect('bulk-set', false);
+  document.getElementById('bulk-set').value = (curSet!=='all' ? curSet : SETS[0]?.id) || 'default';
+  document.getElementById('bulk-bg').classList.remove('hidden');
+  setTimeout(() => document.getElementById('bulk-ta').focus(), 50);
+}
+function closeBulk() { document.getElementById('bulk-bg').classList.add('hidden'); }
+
+function previewBulk() {
+  const results = [];
+  document.getElementById('bulk-ta').value.split('\n').forEach((raw, i) => {
+    const line = raw.trim(); if (!line) return;
+    const parts = line.split('|').map(s=>s.trim());
+    const word = parts[0];
+    if (!word) { results.push({line:i+1,raw:line,ok:false,err:'단어가 비어있습니다.'}); return; }
+    const synonyms = parts[1] ? tags(parts[1]) : [];
+    const antonyms = parts[2] ? tags(parts[2]) : [];
+    if (!synonyms.length && !antonyms.length) { results.push({line:i+1,raw:line,ok:false,err:'유의어 또는 반의어를 입력해주세요.'}); return; }
+    results.push({ line:i+1, raw:line, ok:true, word, synonyms, antonyms, note:parts[3]?.trim()||'', kor:parts[4]?.trim()||'', eng:parts[5]?.trim()||'' });
+  });
+  bulkParsed = results.filter(r=>r.ok);
+  if (!results.length) { document.getElementById('bulk-preview').innerHTML=''; document.getElementById('bulk-save-btn').disabled=true; return; }
+  const ok=bulkParsed.length, bad=results.length-ok;
+  const rows = results.map(r => r.ok
+    ? `<div class="prow ok"><span class="prow-num">${r.line}</span><span class="prow-word">${esc(r.word)}</span><span style="flex:1;line-height:1.7">${r.synonyms.map(s=>`<span class="tag tsyn" style="font-size:10px">${esc(s)}</span>`).join(' ')} ${r.antonyms.map(s=>`<span class="tag tant" style="font-size:10px">${esc(s)}</span>`).join(' ')}</span></div>`
+    : `<div class="prow err"><span class="prow-num">${r.line}</span><span class="prow-err">⚠️ ${esc(r.err)} — <em>${esc(r.raw.slice(0,40))}</em></span></div>`
+  ).join('');
+  document.getElementById('bulk-preview').innerHTML = `<div class="plist"><div style="font-size:11px;color:var(--muted);background:var(--bg);border-radius:6px;padding:5px 8px;margin-bottom:5px">✅ 저장 가능 <strong>${ok}개</strong>${bad?` &nbsp;|&nbsp; ⚠️ 오류 <strong style="color:var(--err)">${bad}개</strong>`:''}</div>${rows}</div>`;
+  document.getElementById('bulk-save-btn').disabled = ok===0;
+}
+function saveBulk() {
+  if (!bulkParsed.length) return;
+  const setId = document.getElementById('bulk-set').value;
+  const ex = new Set(W.map(w=>w.word.toLowerCase()));
+  let added=0, skipped=0;
+  bulkParsed.forEach(r => {
+    if (ex.has(r.word.toLowerCase())) { skipped++; return; }
+    W.push({ id:uid(), word:r.word, synonyms:r.synonyms, antonyms:r.antonyms, note:r.note, kor:r.kor||'', eng:r.eng||'', setId });
+    added++;
+  });
+  persist(); closeBulk(); renderSetsBar(); renderList();
+  alert(`${added}개 단어가 추가됐습니다.${skipped ? ` (중복 ${skipped}개 건너뜀)` : ''}`);
+}
+
+// ── CARD PRINT ────────────────────────────────────────────────────────────
+function openCardPrint() {
+  fillSelect('card-set', true);
+  document.getElementById('card-set').value = curSet !== 'all' ? curSet : 'all';
+  document.getElementById('card-modal-bg').classList.remove('hidden');
+}
+function closeCardModal() { document.getElementById('card-modal-bg').classList.add('hidden'); }
+
+function printCards() {
+  const setId   = document.getElementById('card-set').value;
+  const cols    = parseInt(document.getElementById('card-cols').value);
+  const style   = document.getElementById('card-style').value;
+  const showNote= document.getElementById('card-note').checked;
+  const showKor = document.getElementById('card-kor').checked;
+  const showEng = document.getElementById('card-eng').checked;
+  const ws      = wordsFor(setId).filter(w => w.synonyms.length || w.antonyms.length || w.kor || w.eng);
+  if (!ws.length) { alert('카드를 만들 단어가 없습니다.'); return; }
+
+  const escH = s => { const d=document.createElement('div');d.textContent=s;return d.innerHTML; };
+
+  const cardCSS = `
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;padding:14px;background:#fff}
+    h2{font-size:13px;font-weight:700;margin-bottom:10px;color:#555}
+    .grid{display:grid;grid-template-columns:repeat(${cols},1fr);gap:8px}
+    .card{border:1.5px dashed #bbb;border-radius:8px;padding:10px 10px 8px;page-break-inside:avoid;min-height:80px;position:relative}
+    .card-word{font-size:${cols<=2?'22px':cols===3?'18px':'14px'};font-weight:800;text-align:center;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid #e5e7eb;letter-spacing:-.5px}
+    .card-kor{font-size:11px;color:#1e40af;text-align:center;margin-bottom:5px;font-weight:600}
+    .card-eng{font-size:9px;color:#78350f;font-style:italic;line-height:1.3;margin-bottom:5px;padding:3px 5px;background:#fef3c7;border-radius:3px}
+    .card-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+    .card-syn .card-label{color:#059669}
+    .card-ant .card-label{color:#dc2626}
+    .card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px}
+    .tag-s{background:#d1fae5;color:#065f46;font-size:10px;padding:2px 6px;border-radius:10px}
+    .tag-a{background:#fee2e2;color:#991b1b;font-size:10px;padding:2px 6px;border-radius:10px}
+    .card-note{font-size:9px;color:#94a3b8;margin-top:3px}
+    .card-front-only{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90px;gap:4px}
+    .card-front-only .card-word{border:none;margin:0;padding:0;font-size:${cols<=2?'26px':cols===3?'20px':'15px'}}
+    .set-label{position:absolute;top:5px;right:7px;font-size:8px;color:#cbd5e1}
+    @media print{body{padding:8px}}
+  `;
+
+  let body = '';
+  if (style === 'full') {
+    body = `<div class="grid">${ws.map(w => `
+      <div class="card">
+        <div class="set-label">${escH(setName(w.setId))}</div>
+        <div class="card-word">${escH(w.word)}</div>
+        ${showKor && w.kor ? `<div class="card-kor">${escH(w.kor)}</div>` : ''}
+        ${w.synonyms.length ? `<div class="card-syn"><div class="card-label">유의어</div><div class="card-tags">${w.synonyms.map(s=>`<span class="tag-s">${escH(s)}</span>`).join('')}</div></div>` : ''}
+        ${w.antonyms.length ? `<div class="card-ant"><div class="card-label">반의어</div><div class="card-tags">${w.antonyms.map(s=>`<span class="tag-a">${escH(s)}</span>`).join('')}</div></div>` : ''}
+        ${showEng && w.eng ? `<div class="card-eng">${escH(w.eng)}</div>` : ''}
+        ${showNote && w.note ? `<div class="card-note">📌 ${escH(w.note)}</div>` : ''}
+      </div>`).join('')}</div>`;
+  } else if (style === 'front') {
+    body = `<div class="grid">${ws.map(w => `
+      <div class="card card-front-only">
+        <div class="set-label">${escH(setName(w.setId))}</div>
+        <div class="card-word">${escH(w.word)}</div>
+        ${showKor && w.kor ? `<div class="card-kor">${escH(w.kor)}</div>` : ''}
+      </div>`).join('')}</div>`;
+  } else {
+    // split: fronts page then backs page
+    const frontGrid = `<div class="grid">${ws.map(w=>`<div class="card card-front-only"><div class="set-label">${escH(setName(w.setId))}</div><div class="card-word">${escH(w.word)}</div>${showKor && w.kor ? `<div class="card-kor">${escH(w.kor)}</div>` : ''}</div>`).join('')}</div>`;
+    const backGrid  = `<div class="grid">${ws.map(w=>`<div class="card">
+      ${w.synonyms.length ? `<div class="card-syn"><div class="card-label">유의어</div><div class="card-tags">${w.synonyms.map(s=>`<span class="tag-s">${escH(s)}</span>`).join('')}</div></div>` : ''}
+      ${w.antonyms.length ? `<div class="card-ant"><div class="card-label">반의어</div><div class="card-tags">${w.antonyms.map(s=>`<span class="tag-a">${escH(s)}</span>`).join('')}</div></div>` : ''}
+      ${showEng && w.eng ? `<div class="card-eng">${escH(w.eng)}</div>` : ''}
+      ${showNote && w.note ? `<div class="card-note">📌 ${escH(w.note)}</div>` : ''}
+    </div>`).join('')}</div>`;
+    body = `<h2>▶ 앞면 (단어)</h2>${frontGrid}<div style="page-break-after:always"></div><h2>▶ 뒷면 (유의어·반의어)</h2>${backGrid}`;
+  }
+
+  const html = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>단어 카드</title><style>${cardCSS}</style></head><body>${body}</body></html>`;
+  const w = window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(), 400);
+  closeCardModal();
+}
+
+// ── IMPORT / EXPORT ───────────────────────────────────────────────────────
+function doExport() {
+  if (!W.length) { alert('내보낼 단어가 없습니다.'); return; }
+  const blob = new Blob([JSON.stringify({sets:SETS,words:W},null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '단어장_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+}
+function doImport(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const isCSV = /\.csv$/i.test(f.name) || e.target.accept.includes('csv');
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      let ws = [], ss = null;
+      if (isCSV) {
+        const parsed = parseCSV(ev.target.result);
+        ws = parsed.words;
+        ss = parsed.sets;
+      } else {
+        const d = JSON.parse(ev.target.result);
+        ws = Array.isArray(d) ? d : (d.words||[]);
+        ss = Array.isArray(d) ? null : (d.sets||null);
+      }
+      const valid = ws.filter(w=>w.word && Array.isArray(w.synonyms) && Array.isArray(w.antonyms));
+      if (!valid.length) { alert('유효한 단어 데이터가 없습니다.\n(형식: word,synonyms,antonyms 필수)'); return; }
+      const merge = confirm(`${valid.length}개 단어를 불러옵니다.\n\n[확인] 기존 단어에 추가\n[취소] 기존 단어 교체`);
+      if (merge) {
+        if (ss) ss.forEach(s=>{ if(!SETS.find(x=>x.id===s.id)) SETS.push(s); });
+        const ex = new Set(W.map(w=>w.word.toLowerCase()));
+        const added = valid.filter(w=>!ex.has(w.word.toLowerCase())).map(w=>({...w,id:w.id||uid(),setId:w.setId||'default'}));
+        W = [...W, ...added];
+        alert(`${added.length}개 단어가 추가됐습니다.`);
+      } else {
+        if (ss) SETS = ss;
+        W = valid.map(w=>({...w,id:w.id||uid(),setId:w.setId||'default'}));
+        alert(`${W.length}개 단어로 교체됐습니다.`);
+      }
+      persist(); renderSetsBar(); renderList();
+    } catch (err) { alert('파일 처리 오류: '+err.message); }
+  };
+  r.readAsText(f); e.target.value='';
+}
+
+// CSV 파싱 (간단한 RFC4180 호환)
+function parseCSV(text) {
+  const rows = [];
+  let row = [], cur = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i], n = text[i+1];
+    if (inQ) {
+      if (c === '"' && n === '"') { cur += '"'; i++; }
+      else if (c === '"') { inQ = false; }
+      else cur += c;
+    } else {
+      if (c === '"') inQ = true;
+      else if (c === ',') { row.push(cur); cur=''; }
+      else if (c === '\n') { row.push(cur); rows.push(row); row=[]; cur=''; }
+      else if (c === '\r') { /* skip */ }
+      else cur += c;
+    }
+  }
+  if (cur.length || row.length) { row.push(cur); rows.push(row); }
+
+  if (!rows.length) return { words:[], sets:null };
+  const header = rows[0].map(h => h.trim().toLowerCase());
+  const idx = name => header.indexOf(name);
+  const iWord = idx('word');
+  const iSyn  = idx('synonyms');
+  const iAnt  = idx('antonyms');
+  const iNote = idx('note');
+  const iKor  = idx('kor');
+  const iEng  = idx('eng');
+  const iSet  = idx('setid');
+  const iSetName = idx('setname');
+  const startRow = (iWord === -1) ? 0 : 1;
+  if (iWord === -1) return { words:[], sets:null };
+
+  // 세트 처리
+  let sets = null;
+  if (iSetName !== -1 || iSet !== -1) {
+    sets = [];
+    const seen = new Set();
+    for (let r = startRow; r < rows.length; r++) {
+      const row = rows[r];
+      const name = iSetName !== -1 ? row[iSetName] : '';
+      if (!name) continue;
+      if (seen.has(name)) continue;
+      seen.add(name);
+      sets.push({ id: uid(), name, type:'textbook', publisher:'', grade:'', author:'', textbook:'', unit:'' });
+    }
+  }
+
+  const words = [];
+  for (let r = startRow; r < rows.length; r++) {
+    const row = rows[r];
+    const word = (row[iWord] || '').trim();
+    if (!word) continue;
+    const synonyms = iSyn !== -1 ? tags(row[iSyn] || '') : [];
+    const antonyms = iAnt !== -1 ? tags(row[iAnt] || '') : [];
+    if (!synonyms.length && !antonyms.length) continue;
+    let setId = 'default';
+    if (iSet !== -1 && row[iSet]) setId = row[iSet];
+    else if (iSetName !== -1 && row[iSetName] && sets) {
+      const s = sets.find(s => s.name === row[iSetName]);
+      if (s) setId = s.id;
+    }
+    words.push({
+      id: uid(), word, synonyms, antonyms,
+      note: iNote !== -1 ? (row[iNote]||'').trim() : '',
+      kor:  iKor  !== -1 ? (row[iKor]||'').trim()  : '',
+      eng:  iEng  !== -1 ? (row[iEng]||'').trim()  : '',
+      setId
+    });
+  }
+  return { words, sets };
+}
+
+// ── FLASHCARD ─────────────────────────────────────────────────────────────
+function initFC() {
+  const setId = document.getElementById('fc-set').value;
+  const f     = document.getElementById('fc-filter').value;
+  const base  = wordsFor(setId);
+  fcList = base.filter(w => f==='syn'?w.synonyms.length:f==='ant'?w.antonyms.length:(w.synonyms.length||w.antonyms.length));
+  fcIdx  = 0;
+  document.getElementById('fc-card').classList.remove('flipped');
+  const empty = document.getElementById('fc-empty'), body = document.getElementById('fc-body');
+  if (!fcList.length) { empty.classList.remove('hidden'); body.classList.add('hidden'); }
+  else { empty.classList.add('hidden'); body.classList.remove('hidden'); renderFC(); }
+}
+function renderFC() {
+  const w = fcList[fcIdx];
+  document.getElementById('fc-word').textContent  = w.word;
+  document.getElementById('fc-bword').textContent = w.word;
+  document.getElementById('fc-syn-tags').innerHTML = w.synonyms.map(s=>`<span class="tag tsyn">${esc(s)}</span>`).join('');
+  document.getElementById('fc-ant-tags').innerHTML = w.antonyms.map(s=>`<span class="tag tant">${esc(s)}</span>`).join('');
+  document.getElementById('fc-syn-sec').style.display = w.synonyms.length?'':'none';
+  document.getElementById('fc-ant-sec').style.display = w.antonyms.length?'':'none';
+  document.getElementById('fc-kor').textContent = w.kor || '';
+  document.getElementById('fc-kor-sec').style.display = w.kor?'':'none';
+  document.getElementById('fc-eng').textContent = w.eng || '';
+  document.getElementById('fc-eng-sec').style.display = w.eng?'':'none';
+  document.getElementById('fc-note-wrap').textContent = w.note?'📌 '+w.note:'';
+  document.getElementById('fc-cnt').textContent = `${fcIdx+1} / ${fcList.length}`;
+  document.getElementById('fc-pfill').style.width = ((fcIdx+1)/fcList.length*100).toFixed(0)+'%';
+  document.getElementById('fc-card').classList.remove('flipped');
+}
+function flipFC() { document.getElementById('fc-card').classList.toggle('flipped'); }
+function fcPrev() { if(fcIdx>0){ fcIdx--; renderFC(); } }
+function fcNext() { if(fcIdx<fcList.length-1){ fcIdx++; renderFC(); } }
+function shuffleFC() { fcList=shuffle(fcList); fcIdx=0; renderFC(); }
+
+// ── QUIZ ──────────────────────────────────────────────────────────────────
+function buildQs(ws, type) {
+  const qs=[];
+  for (const w of ws) {
+    if (type!=='ant'&&w.synonyms.length) { const a=w.synonyms[0|Math.random()*w.synonyms.length]; qs.push({word:w.word,kind:'syn',answer:a,wid:w.id,all_syn:w.synonyms,all_ant:w.antonyms}); }
+    if (type!=='syn'&&w.antonyms.length) { const a=w.antonyms[0|Math.random()*w.antonyms.length]; qs.push({word:w.word,kind:'ant',answer:a,wid:w.id,all_syn:w.synonyms,all_ant:w.antonyms}); }
+  }
+  return shuffle(qs);
+}
+function getWrongs(q, n) {
+  const pool=[], invalid=new Set([...q.all_syn,...q.all_ant]);
+  W.forEach(w=>{ if(w.id!==q.wid) pool.push(...w.synonyms,...w.antonyms); });
+  return shuffle([...new Set(pool)].filter(x=>!invalid.has(x))).slice(0,n);
+}
+function startQuiz() {
+  const setId=document.getElementById('q-set').value, type=document.getElementById('q-type').value;
+  const cnt=parseInt(document.getElementById('q-count').value)||0;
+  const ws=wordsFor(setId);
+  if(ws.length<4){ alert('선택한 세트에 최소 4개 단어가 필요합니다.'); return; }
+  const all=buildQs(ws,type);
+  if(!all.length){ alert('선택한 유형에 해당하는 단어가 없습니다.'); return; }
+  qQs=cnt?all.slice(0,cnt):all; qIdx=0; qScore=0;
+  document.getElementById('q-setup').classList.add('hidden');
+  document.getElementById('q-play').classList.remove('hidden');
+  document.getElementById('q-result').classList.add('hidden');
+  renderQ();
+}
+function renderQ() {
+  qDone=false;
+  const q=qQs[qIdx], total=qQs.length;
+  document.getElementById('q-pbar').style.width=(qIdx/total*100)+'%';
+  const lbl=document.getElementById('q-type-lbl');
+  lbl.textContent=q.kind==='syn'?'유의어 (SYNONYM)':'반의어 (ANTONYM)';
+  lbl.className='qtype '+(q.kind==='syn'?'syn':'ant');
+  document.getElementById('q-word').textContent=q.word;
+  document.getElementById('q-prompt').textContent=`"${q.word}"의 ${q.kind==='syn'?'유의어':'반의어'}를 고르세요. (${qIdx+1}/${total})`;
+  const choices=shuffle([q.answer,...getWrongs(q,3).slice(0,3)]);
+  document.getElementById('q-choices').innerHTML=choices.map(c=>`<button class="choice" data-val="${esc(c)}" onclick="pick(this)">${esc(c)}</button>`).join('');
+  document.getElementById('q-next').classList.add('hidden');
+}
+function pick(btn) {
+  if(qDone) return; qDone=true;
+  const sel=btn.dataset.val, ans=qQs[qIdx].answer;
+  document.querySelectorAll('.choice').forEach(b=>b.disabled=true);
+  if(sel===ans){ btn.classList.add('correct'); qScore++; qQs[qIdx].correct=true; }
+  else { btn.classList.add('wrong'); qQs[qIdx].correct=false; document.querySelectorAll('.choice').forEach(b=>{ if(b.dataset.val===ans) b.classList.add('correct'); }); }
+  qQs[qIdx].picked=sel;
+  const nb=document.getElementById('q-next');
+  nb.classList.remove('hidden');
+  nb.textContent=qIdx===qQs.length-1?'결과 보기 →':'다음 →';
+}
+function nextQ() { if(qIdx<qQs.length-1){ qIdx++; renderQ(); } else showResult(); }
+function showResult() {
+  document.getElementById('q-play').classList.add('hidden');
+  document.getElementById('q-result').classList.remove('hidden');
+  const pct=Math.round(qScore/qQs.length*100);
+  document.getElementById('r-pct').textContent=pct+'%';
+  document.getElementById('r-sub').textContent=`${qScore} / ${qQs.length} 정답`;
+  document.getElementById('r-msg').textContent=pct===100?'🎉 완벽해요!':pct>=80?'👍 잘했어요!':pct>=60?'🙂 조금만 더!':'💪 다시 도전해봐요!';
+  ST.done++; if(pct>ST.best) ST.best=pct; persist();
+  const wrongs=qQs.filter(q=>!q.correct);
+  document.getElementById('q-review').innerHTML=wrongs.length
+    ? `<div style="color:var(--err);font-weight:700;font-size:13px;margin-bottom:7px">틀린 문제 복습 (${wrongs.length}개)</div>`+wrongs.map(q=>`<div class="ritem"><div class="ritem-word">${esc(q.word)}</div><div style="font-size:10px;color:var(--muted)">${q.kind==='syn'?'유의어':'반의어'} 문제</div><div style="margin-top:4px;font-size:11px"><span style="color:var(--err)">내 답: ${esc(q.picked||'(없음)')}</span> → <span style="color:var(--ok)">정답: ${esc(q.answer)}</span></div></div>`).join('')
+    : '';
+}
+function quitQuiz() { if(!confirm('퀴즈를 그만할까요?')) return; document.getElementById('q-play').classList.add('hidden'); document.getElementById('q-setup').classList.remove('hidden'); }
+
+// ── EXAM CREATE ───────────────────────────────────────────────────────────
+function renderExamSetChecks() {
+  document.getElementById('ex-set-checks').innerHTML =
+    `<label class="set-check"><input type="checkbox" value="__all__" onchange="toggleAllSets(this)"> 전체</label>` +
+    SETS.map(s=>`<label class="set-check"><input type="checkbox" value="${s.id}" checked> ${esc(s.name)}</label>`).join('');
+}
+function toggleAllSets(cb) {
+  document.querySelectorAll('#ex-set-checks input[type=checkbox]:not([value="__all__"])').forEach(c=>c.checked=cb.checked);
+}
+function setExamType(t) {
+  examType=t;
+  ['mcq','written','match'].forEach(x=>document.getElementById('et-'+x).classList.remove('active'));
+  document.getElementById('et-'+t).classList.add('active');
+  document.getElementById('ex-cnt-row').style.display = t==='match'?'none':'';
+}
+function getExamWords() {
+  const checked=[...document.querySelectorAll('#ex-set-checks input[type=checkbox]:checked')].map(c=>c.value).filter(v=>v!=='__all__');
+  return checked.length ? W.filter(w=>checked.includes(w.setId)) : W;
+}
+function buildExamQs(ws, kind, cnt) {
+  const qs=[];
+  ws.forEach(w=>{
+    if(kind!=='ant'&&w.synonyms.length) qs.push({word:w.word,kind:'syn',answer:w.synonyms[0],alts:w.synonyms,wid:w.id,all_syn:w.synonyms,all_ant:w.antonyms});
+    if(kind!=='syn'&&w.antonyms.length) qs.push({word:w.word,kind:'ant',answer:w.antonyms[0],alts:w.antonyms,wid:w.id,all_syn:w.synonyms,all_ant:w.antonyms});
+  });
+  const sel=cnt?shuffle(qs).slice(0,cnt):shuffle(qs);
+  if(examType==='mcq') return sel.map(q=>{
+    const pool=[...new Set(ws.flatMap(w=>w.id===q.wid?[]:[...w.synonyms,...w.antonyms]).filter(x=>![...q.all_syn,...q.all_ant].includes(x)))];
+    return {...q, choices:shuffle([q.answer,...shuffle(pool).slice(0,3)])};
+  });
+  return sel;
+}
+function previewExam() {
+  const ws=getExamWords();
+  if(!ws.length){ alert('선택한 세트에 단어가 없습니다.'); return; }
+  const kind=document.getElementById('ex-kind').value;
+  const cnt=parseInt(document.getElementById('ex-count').value)||0;
+  const qs=buildExamQs(ws,kind,examType==='match'?0:cnt);
+  examBuilt={title:document.getElementById('ex-title').value.trim()||'시험',type:examType,questions:qs};
+  const ep=document.getElementById('ex-preview');
+  document.getElementById('ex-preview-wrap').classList.remove('hidden');
+  if(examType==='mcq') {
+    ep.innerHTML=qs.map((q,i)=>`<div style="margin-bottom:12px;font-size:12px"><div style="font-weight:700;margin-bottom:3px">${i+1}. ${q.kind==='syn'?'[유의어]':'[반의어]'} ${esc(q.word)}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">${(q.choices||[]).map((c,j)=>`<div style="border:1px solid var(--border);border-radius:6px;padding:5px 8px;background:#fff">${'①②③④'[j]} ${esc(c)}</div>`).join('')}</div></div>`).join('');
+  } else if(examType==='written') {
+    ep.innerHTML=qs.map((q,i)=>`<div style="margin-bottom:8px;font-size:12px"><strong>${i+1}.</strong> "${esc(q.word)}"의 ${q.kind==='syn'?'유의어':'반의어'}: <span style="border-bottom:1px solid #333;display:inline-block;min-width:100px">&nbsp;</span></div>`).join('');
+  } else {
+    const rights=shuffle(qs.map(q=>q.answer));
+    ep.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px"><div>${qs.map((q,i)=>`<div style="padding:4px 0"><strong>${i+1}.</strong> ${esc(q.word)}</div>`).join('')}</div><div>${rights.map((a,i)=>`<div style="padding:4px 0">${String.fromCharCode(65+i)}. ${esc(a)}</div>`).join('')}</div></div>`;
+  }
+}
+function printExam() {
+  if(!examBuilt) { previewExam(); if(!examBuilt) return; }
+  const showAns=document.getElementById('ex-ans').checked, qs=examBuilt.questions;
+  let body='';
+  if(examBuilt.type==='mcq') body=qs.map((q,i)=>`<div class="q"><div class="qn">${i+1}. <em>${q.kind==='syn'?'[유의어]':'[반의어]'}</em> &ldquo;${esc(q.word)}&rdquo;의 ${q.kind==='syn'?'유의어':'반의어'}를 고르시오.</div><div class="cs">${(q.choices||[]).map((c,j)=>`<span>${'①②③④'[j]} ${esc(c)}</span>`).join('')}</div>${showAns?`<div class="ans">정답: ${esc(q.answer)}</div>`:''}</div>`).join('');
+  else if(examBuilt.type==='written') body=qs.map((q,i)=>`<div class="q"><div class="qn">${i+1}. &ldquo;${esc(q.word)}&rdquo;의 ${q.kind==='syn'?'유의어':'반의어'}를 쓰시오. &nbsp;&nbsp;&nbsp; 답: _________________${showAns?` &nbsp; <span style="color:green">정답: ${esc(q.answer)}</span>`:''}</div></div>`).join('');
+  else { const rights=shuffle(qs.map(q=>q.answer)); body=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div>${qs.map((q,i)=>`<div>${i+1}. ${esc(q.word)}</div>`).join('')}</div><div>${rights.map((a,i)=>`<div>${String.fromCharCode(65+i)}. ${esc(a)}</div>`).join('')}</div></div>`; }
+  const html=`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${esc(examBuilt.title)}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;padding:28px 36px;font-size:13px}h1{font-size:17px;font-weight:800;text-align:center;margin-bottom:3px}.meta{text-align:center;color:#555;font-size:12px;border-bottom:2px solid #000;padding-bottom:9px;margin-bottom:16px}.q{margin-bottom:16px;page-break-inside:avoid}.qn{font-weight:600;margin-bottom:5px}.cs{display:flex;flex-wrap:wrap;gap:14px;margin-left:14px;font-size:12px}.ans{color:green;font-size:11px;margin-top:3px;margin-left:14px}@media print{body{padding:18px 22px}}</style></head><body><h1>${esc(examBuilt.title)}</h1><div class="meta">이름: _________________________ &nbsp;&nbsp;&nbsp; 점수: _____ / ${qs.length}</div>${body}</body></html>`;
+  const w=window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400);
+}
+// 데이터를 최소화된 형식으로 인코딩 (키 단축 + 불필요 필드 제거)
+function encodeExam(title, type, questions) {
+  // t=title, y=type(0=mcq,1=written), q=questions
+  // 각 문제: w=word, k=kind(0=syn,1=ant), a=answer, c=choices(mcq), l=alts(written)
+  const isMcq = type === 'mcq';
+  const slim = {
+    t: title,
+    y: isMcq ? 0 : 1,
+    q: questions.map(q => {
+      const o = { w: q.word, k: q.kind === 'syn' ? 0 : 1, a: q.answer };
+      if (isMcq) o.c = q.choices || [];
+      else       o.l = q.alts   || [q.answer];
+      return o;
+    })
+  };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(slim))));
+}
+
+function shareExam() {
+  if(!examBuilt) { previewExam(); if(!examBuilt) return; }
+  if(examBuilt.type==='match'){ alert('매칭 유형은 공유 링크를 지원하지 않습니다. 인쇄를 이용하세요.'); return; }
+  const allQs = examBuilt.questions;
+  const CHUNK = 50;
+  const parts = [];
+  for(let i=0; i<allQs.length; i+=CHUNK) parts.push(allQs.slice(i, i+CHUNK));
+  const base = location.href.split('#')[0];
+  document.getElementById('ex-share-wrap').classList.remove('hidden');
+  document.getElementById('ex-share-desc').textContent = parts.length > 1
+    ? `문제가 많아 ${parts.length}개 링크로 나눴습니다 (50문제씩). 각 링크를 순서대로 공유하세요:`
+    : '학생에게 아래 링크를 공유하세요:';
+  try {
+    document.getElementById('ex-share-links').innerHTML = parts.map((chunk, idx) => {
+      const title = parts.length > 1 ? `${examBuilt.title} (${idx+1}/${parts.length}부)` : examBuilt.title;
+      const enc = encodeExam(title, examBuilt.type, chunk);
+      const url = base + '#exam=' + enc;
+      const range = `${idx*CHUNK+1}~${Math.min((idx+1)*CHUNK, allQs.length)}번`;
+      return `<div style="margin-bottom:8px">
+        ${parts.length>1 ? `<div style="font-size:11px;font-weight:700;color:var(--p);margin-bottom:3px">${idx+1}부 (${range})</div>` : ''}
+        <div style="display:flex;gap:5px;align-items:center">
+          <input class="share-input" style="flex:1" readonly value="${url.replace(/"/g,'&quot;')}" onclick="this.select()">
+          <button class="btn btn-o btn-sm" onclick="copyText(this.previousElementSibling)">복사</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){ alert('링크 생성 오류: '+e.message); }
+}
+function copyText(inp) { inp.select(); document.execCommand('copy'); alert('복사됐습니다!'); }
+
+// ── EXAM TAKE (student) ───────────────────────────────────────────────────
+function loadExamFromHash() {
+  if(!location.hash.startsWith('#exam=')) return false;
+  try {
+    const raw = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(6)))));
+    // 구형 형식(title/type/questions) 또는 신형 형식(t/y/q) 모두 처리
+    const isNew = raw.t !== undefined;
+    const data = isNew ? {
+      title: raw.t,
+      type:  raw.y === 0 ? 'mcq' : 'written',
+      questions: raw.q.map(q => ({
+        word:    q.w,
+        kind:    q.k === 0 ? 'syn' : 'ant',
+        answer:  q.a,
+        alts:    q.l || [q.a],
+        choices: q.c || null
+      }))
+    } : raw;
+    if(!data.questions?.length) return false;
+    document.querySelector('.nav').style.display='none';
+    show('pg-exam-take');
+    etQs=data.questions; etSubmitted=false;
+    document.getElementById('et-title').textContent=data.title||'시험';
+    document.getElementById('et-meta').textContent=`총 ${etQs.length}문제`;
+    document.getElementById('et-submit-btn').classList.remove('hidden');
+    document.getElementById('et-result').classList.add('hidden');
+    renderExamTake(data.type);
+    return true;
+  } catch { return false; }
+}
+function renderExamTake(type) {
+  document.getElementById('et-questions').innerHTML = etQs.map((q,i) => {
+    const kindLabel = q.kind==='syn'?'유의어 (SYNONYM)':'반의어 (ANTONYM)';
+    const kindClass = q.kind==='syn'?'syn':'ant';
+    if(type==='mcq') return `<div class="et-q" id="etq-${i}"><div class="et-qnum">${i+1} / ${etQs.length}</div><div class="et-qkind ${kindClass}">${kindLabel}</div><div class="et-qword">${esc(q.word)}</div><div class="et-choices" id="etc-${i}">${(q.choices||[]).map((c,j)=>`<button class="et-choice" data-q="${i}" data-val="${esc(c)}" onclick="etPick(this)">${'①②③④'[j]} ${esc(c)}</button>`).join('')}</div></div>`;
+    return `<div class="et-q" id="etq-${i}"><div class="et-qnum">${i+1} / ${etQs.length}</div><div class="et-qkind ${kindClass}">${kindLabel}</div><div class="et-qword">${esc(q.word)}의 ${q.kind==='syn'?'유의어':'반의어'}를 쓰시오.</div><input class="et-inp" id="etw-${i}" placeholder="답을 입력하세요" autocomplete="off"></div>`;
+  }).join('');
+}
+function etPick(btn) {
+  if(etSubmitted) return;
+  const qi=parseInt(btn.dataset.q);
+  document.querySelectorAll(`#etc-${qi} .et-choice`).forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function submitExam() {
+  if(etSubmitted) return; etSubmitted=true;
+  let score=0;
+  const isMcq=!!etQs[0]?.choices;
+  etQs.forEach((q,i) => {
+    if(isMcq) {
+      const sel=document.querySelector(`#etc-${i} .et-choice.sel`);
+      const picked=sel?.dataset.val||'';
+      document.querySelectorAll(`#etc-${i} .et-choice`).forEach(b=>{ b.classList.add('locked'); if(b.dataset.val===q.answer) b.classList.add('correct'); else if(b===sel) b.classList.add('wrong'); });
+      if(picked===q.answer) score++;
+    } else {
+      const inp=document.getElementById(`etw-${i}`);
+      const ans=(inp.value||'').trim().toLowerCase();
+      inp.disabled=true;
+      const alts=(q.alts||[q.answer]).map(s=>s.toLowerCase());
+      if(alts.includes(ans)){ inp.classList.add('correct'); score++; }
+      else { inp.classList.add('wrong'); inp.placeholder='정답: '+q.answer; }
+    }
+  });
+  const pct=Math.round(score/etQs.length*100);
+  document.getElementById('et-submit-btn').classList.add('hidden');
+  document.getElementById('et-result').classList.remove('hidden');
+  document.getElementById('et-rpct').textContent=pct+'%';
+  document.getElementById('et-rsub').textContent=`${score} / ${etQs.length} 정답`;
+  document.getElementById('et-rmsg').textContent=pct===100?'🎉 완벽해요!':pct>=80?'👍 잘했어요!':pct>=60?'🙂 조금만 더!':'💪 다시 도전해봐요!';
+}
+
+// ── KEYBOARD ─────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (document.getElementById('pg-fc').classList.contains('on') && document.getElementById('fc-body').offsetParent) {
+    if (e.key==='ArrowLeft')  { e.preventDefault(); fcPrev(); }
+    if (e.key==='ArrowRight') { e.preventDefault(); fcNext(); }
+    if (e.key===' ' && document.activeElement.tagName!=='INPUT') { e.preventDefault(); flipFC(); }
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+function loadWordsJson(manual = false) {
+  const status = document.getElementById('home-load-status');
+  status.style.display = 'block';
+  status.textContent = '⏳ 단어를 불러오는 중…';
+  fetch('words.json?v=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(d => {
+      const ws = Array.isArray(d) ? d : (d.words || []);
+      const ss = Array.isArray(d) ? null : (d.sets || null);
+      if (!ws.length) throw new Error('단어 데이터가 비어있습니다');
+      if (ss) SETS = ss;
+      W = ws.map(w => ({ ...w, id: w.id || uid(), setId: w.setId || 'default' }));
+      persist();
+      updateHome();
+      status.style.color = 'var(--ok)';
+      status.textContent = `✅ 단어 ${W.length}개 불러오기 완료!`;
+      setTimeout(() => { status.style.display = 'none'; }, 3000);
+    })
+    .catch(e => {
+      status.style.color = 'var(--err)';
+      status.textContent = `❌ 불러오기 실패: ${e.message} — words.json 파일이 올바른 위치에 있는지 확인하세요.`;
+    });
+}
+
+if (!loadExamFromHash()) {
+  updateHome();
+  if (!W.length) loadWordsJson(); // 단어 없으면 자동 시도
+}
+window.addEventListener('hashchange', () => { if (location.hash.startsWith('#exam=')) location.reload(); });
+</script>
+</body>
+</html>
