@@ -50,6 +50,9 @@ main{max-width:920px;margin:0 auto;padding:18px 16px 80px}
 .q-chip.sel{background:var(--p);color:#fff;border-color:var(--p)}
 .q-chip .qcnt{font-size:10px;opacity:.7;font-weight:600}
 .q-chip.sel .qcnt{opacity:.85}
+.q-chip.tb{border-color:#86efac;color:#166534;background:#f0fdf4}
+.q-chip.tb:hover{background:#dcfce7;border-color:#4ade80}
+.q-chip.tb.sel{background:#16a34a;color:#fff;border-color:#16a34a}
 .q-actions{display:flex;gap:4px;margin-top:6px}
 .q-actions button{padding:3px 8px;font-size:10px;border:1px solid var(--border);
   border-radius:6px;background:transparent;color:var(--muted);cursor:pointer}
@@ -90,6 +93,8 @@ main{max-width:920px;margin:0 auto;padding:18px 16px 80px}
 .b-month{background:#fce7f3;color:#9f1239}
 .b-exam{background:#ede9fe;color:#5b21b6}
 .b-q{background:#cffafe;color:#155e75}
+.b-exam.tb{background:#dcfce7;color:#166534;border:1px solid #86efac}
+.b-q.tb{background:#bbf7d0;color:#14532d;border:1px solid #4ade80}
 .witem-syn,.witem-ant{font-size:12px;margin-top:5px;line-height:1.6}
 .witem-syn .tag{background:#d1fae5;color:#065f46;padding:2px 7px;border-radius:11px;font-size:11px;margin-right:3px;display:inline-block;margin-bottom:3px}
 .witem-ant .tag{background:#fee2e2;color:#991b1b;padding:2px 7px;border-radius:11px;font-size:11px;margin-right:3px;display:inline-block;margin-bottom:3px}
@@ -435,6 +440,15 @@ const teacherMode = new URLSearchParams(location.search).get('teacher') === '1';
 /* ═══════════════ UTILS ═══════════════ */
 const shuffle = a => { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]]} return b; };
 const esc = s => { const d=document.createElement('div');d.textContent=s;return d.innerHTML; };
+// 단어 라벨 포매팅 (교과서는 단원 "4과", 시험은 "Q18")
+const fmtQ = w => w.exam === '교과서' ? `${w.questionNo}과` : `Q${w.questionNo}`;
+// 출처 라벨 (교과서: 📚 단원, 모의고사: 📝 년/월 시험)
+const srcBadge = w => {
+  const isTextbook = w.exam === '교과서';
+  const cls = isTextbook ? 'b-exam tb' : 'b-exam';
+  const text = isTextbook ? `📚 교과서 ${w.questionNo}과` : `📝 ${w.year}년 ${w.month}월 ${esc(w.exam)}`;
+  return {cls, text, isTextbook};
+};
 const setView = (name) => {
   currentView = name;
   document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
@@ -504,13 +518,22 @@ function renderHome() {
     return true;
   });
   const counts = {};
-  avail.forEach(w => { const k = String(w.questionNo); counts[k] = (counts[k]||0)+1; });
+  const labelByQ = {}; // q → "4과" or "Q18"
+  const tbByQ = {}; // q → true if textbook
+  avail.forEach(w => {
+    const k = String(w.questionNo);
+    counts[k] = (counts[k]||0)+1;
+    if (!labelByQ[k]) {
+      labelByQ[k] = w.exam === '교과서' ? `${w.questionNo}과` : `Q${w.questionNo}`;
+      tbByQ[k] = w.exam === '교과서';
+    }
+  });
   const qList = [...new Set(avail.map(w => String(w.questionNo)))].sort((a,b) => parseInt(a)-parseInt(b));
   // Remove selections that are no longer available
   filters.questionNos = filters.questionNos.filter(q => qList.includes(q));
   
   document.getElementById('q-chips').innerHTML = qList.length
-    ? qList.map(q => `<span class="q-chip ${filters.questionNos.includes(q)?'sel':''}" onclick="toggleQ('${q}')">Q${q} <span class="qcnt">${counts[q]||0}</span></span>`).join('')
+    ? qList.map(q => `<span class="q-chip ${filters.questionNos.includes(q)?'sel':''}${tbByQ[q]?' tb':''}" onclick="toggleQ('${q}')">${labelByQ[q]} <span class="qcnt">${counts[q]||0}</span></span>`).join('')
     : '<div style="color:var(--muted);font-size:12px;padding:8px 4px">😅 선택 가능한 문제가 없어요. 다른 필터를 조정해보세요.</div>';
   
   document.getElementById('clear-filter').onclick = () => {
@@ -559,10 +582,8 @@ function renderWordList() {
         <div class="witem-word">${esc(w.word)}</div>
         <div class="witem-meta">
           <span class="badge b-grade">${w.grade}</span>
-          <span class="badge b-year">${w.year}</span>
-          <span class="badge b-month">${w.month}월</span>
-          <span class="badge b-exam">${esc(w.exam)}</span>
-          <span class="badge b-q">Q${w.questionNo}</span>
+          <span class="badge ${srcBadge(w).cls}">${srcBadge(w).text}</span>
+          <span class="badge b-q${srcBadge(w).isTextbook?' tb':''}">${fmtQ(w)}</span>
         </div>
         ${w.kor ? `<div class="witem-kor">🇰🇷 ${esc(w.kor)}</div>` : ''}
         ${w.syn.length ? `<div class="witem-syn"><strong style="color:#059669;font-size:11px">유</strong> ${w.syn.map(s=>`<span class="tag">${esc(s)}</span>`).join('')}</div>` : ''}
@@ -602,7 +623,11 @@ function showFC() {
           ${w.ant.length ? `<div class="fc-sec ant"><h4>반 Antonyms</h4><div class="fc-tags">${w.ant.map(s=>`<span class="fc-tag ant">${esc(s)}</span>`).join('')}</div>` : ''}
           ${w.eng ? `<div class="fc-eng">🇺🇸 ${esc(w.eng)}</div>` : ''}
           ${w.kor_ctx ? `<div class="fc-korctx">📝 ${esc(w.kor_ctx)}</div>` : ''}
-          <div style="margin-top:10px;font-size:11px;color:var(--muted)">${w.grade} ${w.year}년 ${w.month}월 ${esc(w.exam)} · Q${w.questionNo}</div>
+          <div style="margin-top:10px;font-size:11px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <span class="badge b-grade">${w.grade}</span>
+            <span class="badge ${srcBadge(w).cls}">${srcBadge(w).text}</span>
+            <span class="badge b-q${srcBadge(w).isTextbook?' tb':''}">${fmtQ(w)}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -863,8 +888,8 @@ function renderWrong() {
           <div class="witem-word">${esc(w.word)}</div>
           <div class="witem-meta">
             <span class="badge b-grade">${w.grade}</span>
-            <span class="badge b-year">${w.year}</span>
-            <span class="badge b-q">Q${w.questionNo}</span>
+            <span class="badge ${srcBadge(w).cls}">${srcBadge(w).text}</span>
+            <span class="badge b-q${srcBadge(w).isTextbook?' tb':''}">${fmtQ(w)}</span>
           </div>
           <div class="witem-kor">🇰🇷 ${esc(w.kor)}</div>
           <button class="btn btn-o btn-sm" style="margin-top:6px" onclick="removeWrong('${w.id}')">✅ 다시 풀었음</button>
