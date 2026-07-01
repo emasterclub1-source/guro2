@@ -431,6 +431,226 @@ TEXTBOOK_RAW.forEach(w => {
   });
 });
 
+/* Mock exam 2025-06 data: MOCK_RAW */
+const MOCK_RAW = [
+{"qn":18,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"express","syn":["convey","articulate","communicate"],"ant":["conceal","hide","suppress"],"kor":"표현하다","eng":"to convey a thought or feeling in words, gestures, or actions","kor_ctx":"생각이나 느낌을 말이나 몸짓으로 전달하다"},
+{"word":"exceptional","syn":["outstanding","extraordinary","remarkable"],"ant":["ordinary","mediocre","common"],"kor":"뛰어난, 특출한","eng":"unusual or extraordinary; far above average","kor_ctx":"보통보다 훨씬 뛰어난"},
+{"word":"renewal","syn":["extension","continuation","recommencement"],"ant":["termination","cancellation"],"kor":"갱신, (기한) 연장","eng":"the act of making something new again or extending its period","kor_ctx":"다시 새로워지게 하거나 기한을 늘리는 것"},
+{"word":"extension","syn":["prolongation","renewal","continuation"],"ant":["reduction","shortening","curtailment"],"kor":"(기간의) 연장","eng":"the act of making something longer in time","kor_ctx":"기간이나 시간을 더 길게 늘리는 것"},
+{"word":"continued","syn":["sustained","ongoing","persistent"],"ant":["interrupted","sporadic","discontinued"],"kor":"지속적인","eng":"lasting or persisting without interruption","kor_ctx":"중단 없이 계속 이어지는"},
+{"word":"enhance","syn":["improve","boost","strengthen"],"ant":["diminish","weaken","impair"],"kor":"향상시키다","eng":"to improve or increase the quality, value, or extent of something","kor_ctx":"품질이나 가치를 더 높게 만들다"}
+]},
+{"qn":19,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"harsh","syn":["glaring","severe","rough"],"ant":["soft","gentle","mild"],"kor":"가혹한, 강렬한","eng":"unpleasantly severe or strong; excessively rough","kor_ctx":"너무 거칠거나 엄격하여 불쾌한"},
+{"word":"unwell","syn":["ill","sick"],"ant":["well","healthy","fine"],"kor":"아픈, 편치 않은","eng":"not in good health; feeling ill","kor_ctx":"건강하지 않고 몸 상태가 안 좋은"},
+{"word":"concern","syn":["worry","anxiety","apprehension"],"ant":["calm","ease","serenity"],"kor":"걱정, 우려","eng":"a feeling of worry or anxiety about something","kor_ctx":"어떤 일에 대한 불안하고 걱정되는 마음"},
+{"word":"reassure","syn":["comfort","calm","console"],"ant":["alarm","disturb","upset"],"kor":"안심시키다","eng":"to say or do something that removes someone's doubts or fears","kor_ctx":"다른 사람의 불안이나 걱정을 사라지게 하다"},
+{"word":"comfortable","syn":["at ease","relaxed","cozy"],"ant":["uncomfortable","uneasy"],"kor":"편안한","eng":"giving a feeling of physical or mental ease","kor_ctx":"몸이나 마음이 편하고 안락한"},
+{"word":"peacefully","syn":["calmly","serenely","quietly"],"ant":["noisily","turbulently"],"kor":"평화롭게","eng":"in a calm and quiet manner; without disturbance","kor_ctx":"소동 없이 고요하고 평온하게"},
+{"word":"calm","syn":["tranquility","serenity","peace"],"ant":["chaos","agitation"],"kor":"안도, 침착","eng":"a state of quietness and peace; absence of disturbance","kor_ctx":"동요 없이 고요하고 안정된 상태"}
+]},
+{"qn":20,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"impermeable","syn":["waterproof","impenetrable","sealed"],"ant":["permeable","porous","leaky"],"kor":"스며들지 않는","eng":"not allowing liquid or gas to pass through","kor_ctx":"액체나 기체가 통과하지 못하는"},
+{"word":"porous","syn":["permeable","waterproof","impenetrable"],"ant":["sealed"],"kor":"구멍이 있는","eng":"having tiny holes that allow liquid or air to pass through","kor_ctx":"작은 구멍이 있어서 물이나 공기가 통과하는"},
+{"word":"thrive","syn":["flourish","prosper","grow"],"ant":["decline","falter","struggle"],"kor":"성장하다, 잘 자라다","eng":"to grow, develop, or succeed well","kor_ctx":"잘 자라고 번영하다"},
+{"word":"careful","syn":["cautious","watchful","prudent"],"ant":["careless","reckless","incautious"],"kor":"조심스러운","eng":"taking care to avoid harm or mistakes; cautious","kor_ctx":"위험이나 실수 없이 조심하여 행동하는"},
+{"word":"touch","syn":["connect","interact"],"ant":["isolate","avoid","detach"],"kor":"접촉하다","eng":"to come into contact with someone or something","kor_ctx":"물리적으로 닿거나 관계를 맺다"}
+]},
+{"qn":21,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"satisfy","syn":["content","gratify"],"ant":["dissatisfy","frustrate","displease"],"kor":"만족시키다","eng":"to fulfill a need, desire, or expectation","kor_ctx":"필요나 바람을 충족시켜 만족하게 만들다"},
+{"word":"maintain","syn":["preserve","uphold","keep"],"ant":["abandon","discontinue","cease"],"kor":"유지하다, 지키다","eng":"to keep something in good condition or continue having it","kor_ctx":"어떤 상태나 것을 계속 유지하거나 보존하다"},
+{"word":"pointless","syn":["meaningless","futile","useless"],"ant":["meaningful","valuable"],"kor":"무의미한","eng":"having no purpose or meaning","kor_ctx":"목적이나 의미가 없는"},
+{"word":"loss","syn":["deprivation"],"ant":["acquisition","gain","possession"],"kor":"상실감","eng":"the state of being deprived of something; a feeling of grief","kor_ctx":"무언가를 잃은 슬픔이나 결핍"},
+{"word":"miserable","syn":["wretched","dejected"],"ant":["happy","joyful","cheerful"],"kor":"비참한","eng":"extremely unhappy or uncomfortable","kor_ctx":"몸시 불행하고 고통스러운"}
+]},
+{"qn":22,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"vivid","syn":["clear","graphic","striking"],"ant":["vague","dull","faint"],"kor":"생생한","eng":"producing strong, clear, and detailed images in the mind","kor_ctx":"선명하고 생동감 있게 느껴지는"},
+{"word":"similar to","syn":["analogous to","akin to","comparable to"],"ant":["dissimilar to","different from","distinct from"],"kor":"~와 유사한","eng":"resembling but not identical to something","kor_ctx":"~와 비슷하지만 똑같지는 않은"},
+{"word":"attract","syn":["entice","allure","draw"],"ant":["repel","deter","discourage"],"kor":"유혹하다, 유인하다","eng":"to cause someone to come toward or be interested in something","kor_ctx":"관심을 끌거나 끌어당기다"},
+{"word":"flashy","syn":["showy","ostentatious","understated"],"ant":["plain"],"kor":"화려한, 현란한","eng":"showy or elaborate in a way that attracts attention","kor_ctx":"눈에 띄도록 화려하고 지나치게 빛나는"},
+{"word":"obtain","syn":["acquire","gain","procure"],"ant":["lose","forgo"],"kor":"얻다, 획득하다","eng":"to get or acquire something","kor_ctx":"무언가를 손에 넣거나 획득하다"},
+{"word":"effectively","syn":["efficiently","successfully","productively"],"ant":["ineffectively","poorly","inefficiently"],"kor":"효과적으로","eng":"in a way that produces the desired result","kor_ctx":"목적하는 결과를 가져오는 방식으로"}
+]},
+{"qn":23,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"opt for","syn":["choose","select","prefer"],"ant":["reject","refuse","decline"],"kor":"~을 선택하다","eng":"to make a choice or decision","kor_ctx":"여러 가지 중에서 하나를 고르다"},
+{"word":"generously","syn":["bountifully","munificently"],"ant":["sparingly","meagerly","stingily"],"kor":"충분히, 후하게","eng":"in a way that shows willingness to give or share abundantly","kor_ctx":"아낌없이 넉넉하게"},
+{"word":"simple","syn":["easy","straightforward","uncomplicated"],"ant":["complex","complicated","difficult"],"kor":"단순한","eng":"easily understood or done; not complicated","kor_ctx":"복잡하지 않고 쉽고 간단한"},
+{"word":"inconsistent","syn":["contradictory"],"ant":["consistent","coherent"],"kor":"일관되지 않은, 모순된","eng":"not staying the same in behavior or quality; contradictory","kor_ctx":"일관성이 없거나 서로 모순되는"},
+{"word":"give up","syn":["abandon","surrender","relinquish"],"ant":["keep","retain","persist"],"kor":"포기하다","eng":"to stop trying or attempting something","kor_ctx":"하던 것을 그만두고 포기하다"}
+]},
+{"qn":24,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"reliably","syn":["consistently","accurately"],"ant":["unreliably","inconsistently","inaccurately"],"kor":"확실히, 믿을 수 있게","eng":"in a dependable and consistent manner","kor_ctx":"믿을 수 있고 안정된 방식으로"},
+{"word":"incorrect","syn":["false","erroneous","mistaken"],"ant":["correct","accurate","true"],"kor":"잘못된, 틀린","eng":"not correct; wrong or inaccurate","kor_ctx":"사실과 다르고 틀린"},
+{"word":"clear","syn":["obvious","distinct","apparent"],"ant":["vague","ambiguous","obscure"],"kor":"명확한","eng":"easy to perceive, understand, or interpret","kor_ctx":"쉽게 알 수 있고 분명한"},
+{"word":"close to","syn":["near to","approaching","akin to"],"ant":["far from","distant from"],"kor":"~에 근접한","eng":"near in distance, time, or relationship","kor_ctx":"거리나 시간적으로 가까운"}
+]},
+{"qn":25,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"consistently","syn":["uniformly","steadily","invariably"],"ant":["inconsistently","erratically","variably"],"kor":"일관되게, 한결같이","eng":"in a steady and unchanging way over time","kor_ctx":"변하지 않고 한결같이"},
+{"word":"decrease","syn":["reduce","diminish","lessen"],"ant":["increase","grow","expand"],"kor":"감소하다, 줄다","eng":"to become smaller or less in amount or degree","kor_ctx":"양이나 정도가 적어지다"},
+{"word":"drop","syn":["fall","decline","plummet"],"ant":["rise","climb","soar"],"kor":"떨어지다, 감소하다","eng":"to fall or decrease suddenly in amount, value, or level","kor_ctx":"갑자기 떨어지거나 줄어들다"}
+]},
+{"qn":26,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"talented","syn":["gifted","skillful","adept"],"ant":["untalented","unskilled","inept"],"kor":"재능있는","eng":"having a natural ability or skill for something","kor_ctx":"타고난 능력이 있는"},
+{"word":"strengthen","syn":["reinforce","consolidate","enhance"],"ant":["weaken","undermine","diminish"],"kor":"공고히 하다, 강화하다","eng":"to make something stronger or more effective","kor_ctx":"더 강하거나 견고하게 만들다"},
+{"word":"stunning","syn":["breathtaking","magnificent","impressive"],"ant":["unimpressive","ordinary"],"kor":"멋진","eng":"extremely impressive or attractive","kor_ctx":"매우 인상적이고 눈에 띄는"}
+]},
+{"qn":27,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"improve","syn":["enhance","develop","refine"],"ant":["worsen","impair","degrade"],"kor":"향상하다, 개선하다","eng":"to make something better in quality or condition","kor_ctx":"더 좋거나 나은 상태로 만들다"},
+{"word":"available","syn":["accessible","obtainable","usable"],"ant":["unavailable","unobtainable"],"kor":"가능한, 이용할 수 있는","eng":"able to be used or obtained","kor_ctx":"사용하거나 얻을 수 있는"},
+{"word":"include","syn":["contain","incorporate"],"ant":["exclude","omit","remove"],"kor":"포함하다","eng":"to have something as part of a whole","kor_ctx":"전체의 부분으로 가지다"}
+]},
+{"qn":28,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"conserve","syn":["preserve","protect"],"ant":["squander","deplete"],"kor":"보존하다, 보호하다","eng":"to protect something from harm or from being used up","kor_ctx":"망가지거나 닳지 않도록 지키다"},
+{"word":"pick up","syn":["gather","collect","retrieve"],"ant":["drop","discard","put down"],"kor":"줍다","eng":"to take or lift something up from a surface","kor_ctx":"바닥이나 놓인 곳에서 무언가를 들어 올리다"},
+{"word":"comfortable","syn":["cozy","relaxed","easy"],"ant":["uncomfortable","uneasy","restrictive"],"kor":"편안한","eng":"giving a feeling of physical or mental comfort","kor_ctx":"몸이나 마음이 편한"}
+]},
+{"qn":29,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"accurately","syn":["precisely","correctly","exactly"],"ant":["inaccurately","incorrectly","imprecisely"],"kor":"정확하게","eng":"in a way that is exact and without error","kor_ctx":"틀림없이 정확하게"},
+{"word":"observation","syn":["scrutiny","examination"],"ant":["disregard","oversight","ignorance"],"kor":"관찰","eng":"the act of watching or noticing something carefully","kor_ctx":"무언가를 주의 깊게 살펴보는 행위"},
+{"word":"realistic","syn":["lifelike","plausible"],"ant":["unrealistic","imaginary","fantastical"],"kor":"현실적인","eng":"showing things as they really are; practical","kor_ctx":"실제로 가능하거나 진짜 같은"},
+{"word":"differently","syn":["similarly","identically","uniformly"],"ant":["similarly","identically","divergently"],"kor":"다르게","eng":"in a manner that is not the same as something else","kor_ctx":"다른 방식으로"},
+{"word":"stick with","syn":["adhere to","persist in"],"ant":["abandon","deviate from","change"],"kor":"~을 고수하다","eng":"to continue doing or using something","kor_ctx":"어떤 것을 계속 유지하거나 포기하지 않다"}
+]},
+{"qn":30,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"low","syn":[],"ant":["high"],"kor":"낮은","eng":"below average in amount, position, or level","kor_ctx":"높이가 작거나 정도가 적은"},
+{"word":"decrease","syn":["reduction","decline","fall"],"ant":["increase","rise","growth"],"kor":"감소","eng":"the act or process of becoming smaller or less","kor_ctx":"줄어드는 것"},
+{"word":"stimulate","syn":["encourage","activate","boost"],"ant":["hinder","suppress","inhibit"],"kor":"촉진하다, 자극하다","eng":"to encourage or arouse activity or interest","kor_ctx":"활동이나 반응을 일으키게 하다"},
+{"word":"shrink","syn":["contraction","reduction","decrease"],"ant":["expansion","growth","increase"],"kor":"감소, 수축","eng":"to become smaller in size, amount, or value","kor_ctx":"크기나 양이 작아지다"},
+{"word":"boost","syn":["surge","upswing","enhancement"],"ant":["downturn","decline","setback"],"kor":"활력, 증가","eng":"an increase or improvement in something","kor_ctx":"무언가가 증가하거나 향상되는 것"},
+{"word":"loss","syn":["deficit","detriment","deprivation"],"ant":["gain","profit","acquisition"],"kor":"손실","eng":"the fact of no longer having something","kor_ctx":"무언가를 잃는 것"},
+{"word":"excess","syn":["surplus","abundance","superfluity"],"ant":["shortage","deficiency","lack"],"kor":"과잉, 지나침","eng":"an amount that is more than necessary or expected","kor_ctx":"필요한 것보다 더 많은 양"}
+]},
+{"qn":31,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"forget","syn":["remember","recall","recollect"],"ant":["overlook","disregard","neglect"],"kor":"잊다","eng":"to fail to remember something","kor_ctx":"기억에서 사라지다"},
+{"word":"complex","syn":["intricate","complicated","elaborate"],"ant":["simple","straightforward"],"kor":"복잡한","eng":"consisting of many interconnected parts; complicated","kor_ctx":"부분이 많아서 간단하지 않은"},
+{"word":"thoroughly","syn":["completely","fully","comprehensively"],"ant":["superficially","partially","incompletely"],"kor":"철저하게, 철두철미하게","eng":"in a complete and careful way","kor_ctx":"빠짐없이 자세하게"},
+{"word":"effective","syn":["efficient","potent","impactful"],"ant":["ineffective"],"kor":"효과적인","eng":"producing the desired result; successful","kor_ctx":"원하는 결과를 가져오는"},
+{"word":"rigor","syn":["severity"],"ant":["ease","flexibility"],"kor":"엄격함","eng":"the quality of being strict and thorough","kor_ctx":"매우 엄격하고 철저한 성질"},
+{"word":"wake up","syn":["arouse","stimulate","activate"],"ant":["suppress","dull"],"kor":"깨우다","eng":"to cause someone to stop sleeping; to rouse","kor_ctx":"잠을 깨게 하거나 의식을 불러일으키다"}
+]},
+{"qn":32,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"embrace","syn":["adopt","accept"],"ant":["reject","oppose","resist"],"kor":"받아들이다, 수용하다","eng":"to accept or support something willingly","kor_ctx":"기꺼이 받아들이거나 지지하다"},
+{"word":"radically","syn":["fundamentally","entirely","drastically"],"ant":["slightly","marginally"],"kor":"혁신적으로, 근본적으로","eng":"in a way that involves fundamental change","kor_ctx":"근본적으로 크게 바꾸어"},
+{"word":"similar to","syn":["analogous to","comparable to","akin to"],"ant":["different from","unlike","distinct from"],"kor":"~와 유사한","eng":"having qualities in common with something","kor_ctx":"~와 공통된 특징을 가진"},
+{"word":"win over","syn":["persuade","convince"],"ant":["deter"],"kor":"~을 사로잡다, 설득하다","eng":"to persuade someone to support you or your idea","kor_ctx":"상대방을 자기편으로 끌어들이다"},
+{"word":"unfamiliar","syn":["unknown","foreign","alien"],"ant":["familiar","known"],"kor":"낯선, 익숙하지 않은","eng":"not known or recognized; strange","kor_ctx":"알지 못하고 잘 모르는"},
+{"word":"easy","syn":["simple","straightforward","manageable"],"ant":["difficult","challenging","complex"],"kor":"쉬운","eng":"achieved without great effort; not difficult","kor_ctx":"쉽게 할 수 있는; 노력이 많이 들지 않는"},
+{"word":"obvious","syn":["clear","apparent","evident"],"ant":["subtle","obscure"],"kor":"분명한, 명백한","eng":"easily perceived or understood; clearly visible","kor_ctx":"쉽게 알 수 있고 명확한"}
+]},
+{"qn":33,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"rational","syn":["logical","reasonable","sensible"],"ant":["irrational","illogical","unreasonable"],"kor":"이성적인, 합리적인","eng":"based on clear thought or reason rather than emotion","kor_ctx":"이성에 근거하여 판단하는"},
+{"word":"effective","syn":["efficient","successful","potent"],"ant":["ineffective","futile","unproductive"],"kor":"효과적인","eng":"producing the intended result; successful","kor_ctx":"기대한 결과를 가져오는"},
+{"word":"sparkling","syn":["glittering","gleaming"],"ant":["dull","dim","dark"],"kor":"번쩍이는, 눈부신","eng":"shining with small flashes of light","kor_ctx":"작은 빛이 반짝이는"},
+{"word":"bright","syn":["luminous","radiant","brilliant"],"ant":["dim","dark","faint"],"kor":"밝은","eng":"giving out a lot of light; shining","kor_ctx":"빛이 환하게 나오는"},
+{"word":"irrational","syn":["illogical","unreasonable","unsound"],"ant":["rational","logical","sensible"],"kor":"비이성적인","eng":"not based on clear reason; illogical","kor_ctx":"이성에 맞지 않는"},
+{"word":"simple","syn":["straightforward","basic"],"ant":["complex","intricate","elaborate"],"kor":"간단한","eng":"easily understood or done; not complicated","kor_ctx":"복잡하지 않고 쉬운"}
+]},
+{"qn":34,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"outside","syn":["external","outer","exterior"],"ant":["inside","internal","inner"],"kor":"외부의","eng":"located on or relating to the outer side of something","kor_ctx":"바깥쪽에 있는"},
+{"word":"awake","syn":["conscious","alert","wakeful"],"ant":["asleep","unconscious"],"kor":"깨어있는","eng":"not sleeping; conscious and alert","kor_ctx":"잠자지 않고 의식이 있는"},
+{"word":"isolate","syn":["separate","detach","segregate"],"ant":["connect","integrate","combine"],"kor":"분리하다, 격리하다","eng":"to set apart from others; to keep separate","kor_ctx":"다른 것과 떼어놓거나 떨어지게 하다"},
+{"word":"clearly","syn":["distinctly","evidently","obviously"],"ant":["vaguely","ambiguously","obscurely"],"kor":"명확하게","eng":"in a way that is easy to understand or see","kor_ctx":"분명하고 알기 쉽게"},
+{"word":"incoherent","syn":["illogical","disjointed","irrational"],"ant":["coherent","logical","consistent"],"kor":"일관성 없는, 비논리적인","eng":"not logical or well-organized; disordered","kor_ctx":"논리적이지 않고 체계적이지 않은"},
+{"word":"constant","syn":["continuous","perpetual","unceasing"],"ant":["intermittent","sporadic","infrequent"],"kor":"지속적인, 끊임없는","eng":"occurring continuously over a period of time","kor_ctx":"계속 이어져 멈추지 않는"}
+]},
+{"qn":35,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"exactly","syn":["precisely","accurately","truly"],"ant":["approximately","roughly","vaguely"],"kor":"정확하게, 틀림없이","eng":"in a precise or accurate manner; precisely","kor_ctx":"틈새없이 정확하게"},
+{"word":"accurate","syn":["precise"],"ant":["inaccurate","erroneous","distorted"],"kor":"정확한","eng":"free from error; correct and precise","kor_ctx":"틀림이 없이 옳은"},
+{"word":"threat","syn":["danger","peril","menace"],"ant":["safety","security","protection"],"kor":"위협, 협박","eng":"a statement of intention to cause harm or damage","kor_ctx":"해를 끼치겠다는 의도나 위험한 상황"},
+{"word":"instantaneously","syn":["immediately","instantly","promptly"],"ant":["gradually","slowly"],"kor":"즉시, 동시에","eng":"happening immediately and without delay","kor_ctx":"아무 지체 없이 바로"},
+{"word":"conscious","syn":["deliberate","intentional"],"ant":["unconscious","involuntary"],"kor":"의식적인, 의도적인","eng":"aware of and responding to one's surroundings; intentional","kor_ctx":"자신의 행동이나 의도를 분명히 인식하는"},
+{"word":"cease","syn":["stop","halt","discontinue"],"ant":["start","continue","resume"],"kor":"멈추다, 그치다","eng":"to come or bring to an end","kor_ctx":"하던 일을 중단하다"},
+{"word":"retain","syn":["keep","preserve","maintain"],"ant":["lose","discard","relinquish"],"kor":"유지하다, 보유하다","eng":"to keep or continue to have something","kor_ctx":"무언가를 계속 가지고 있거나 유지하다"},
+{"word":"hardwired","syn":["ingrained","innate","inborn"],"ant":["learned","acquired"],"kor":"굳어진, 타고난","eng":"deeply ingrained or built-in from the start","kor_ctx":"타고나서부터 깊이 내재되어 있는"},
+{"word":"disagreeable","syn":["unpleasant","offensive","unlikable"],"ant":["pleasant","agreeable","enjoyable"],"kor":"불쾌한, 무례한","eng":"not pleasant or friendly","kor_ctx":"불쾌하거나 마음에 들지 않는"}
+]},
+{"qn":36,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"suitable","syn":["appropriate","proper","fitting"],"ant":["unsuitable","inappropriate","improper"],"kor":"적절한, 적합한","eng":"right or appropriate for a particular purpose","kor_ctx":"어떤 목적이나 상황에 잘 맞는"},
+{"word":"fracture","syn":["break","shatter"],"ant":["mend","repair"],"kor":"깨지다, 부서지다","eng":"to break or cause to break, especially a bone or hard substance","kor_ctx":"단단한 것이 부러지거나 깨지다"},
+{"word":"susceptible to","syn":["vulnerable to","prone to","subject to"],"ant":["resistant to","immune to","impervious to"],"kor":"~에 영향받기 쉬운","eng":"likely to be affected or harmed by something","kor_ctx":"어떤 것에 쉽게 영향을 받거나 당하는"},
+{"word":"static","syn":["immobile","stationary","fixed"],"ant":["dynamic","moving","changing"],"kor":"고정된","eng":"not moving or changing; stationary","kor_ctx":"움직이지 않고 고정되어 있는"},
+{"word":"limited","syn":["restricted","constrained"],"ant":["unlimited","unrestricted","boundless"],"kor":"제한된","eng":"small in amount or scope; not boundless","kor_ctx":"범위나 양에 한계가 있는"},
+{"word":"dominant","syn":["prevalent","prevailing","leading"],"ant":["subordinate","minor","secondary"],"kor":"지배적인, 우세한","eng":"most important, powerful, or noticeable","kor_ctx":"가장 강력하거나 영향력이 있는"},
+{"word":"remarkable","syn":["extraordinary","noteworthy"],"ant":["ordinary","unremarkable","commonplace"],"kor":"놀라운, 주목할 만한","eng":"worthy of attention; striking or unusual","kor_ctx":"주목할 정도로 뛰어난"}
+]},
+{"qn":37,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"complex","syn":["intricate","complicated","multifaceted"],"ant":["simple","straightforward"],"kor":"복잡한","eng":"consisting of many interconnected parts; complicated","kor_ctx":"부분이 많아서 간단하지 않은"},
+{"word":"precise","syn":["exact","accurate"],"ant":["vague","imprecise"],"kor":"정확한, 정밀한","eng":"exact and accurate; carefully measured","kor_ctx":"아주 정확하고 세밀한"},
+{"word":"support","syn":["uphold","substantiate","reinforce"],"ant":["contradict","undermine","refute"],"kor":"뒷받침하다, 지지하다","eng":"to give assistance, approval, or encouragement to something","kor_ctx":"뒤에서 받쳐주거나 옹호하다"},
+{"word":"obvious","syn":["apparent","evident","clear"],"ant":["subtle","obscure"],"kor":"명백한, 분명한","eng":"easily perceived or understood; clear","kor_ctx":"쉽게 알 수 있고 분명한"},
+{"word":"connection","syn":["link","relationship","tie"],"ant":["disconnection","separation","detachment"],"kor":"연결","eng":"a relationship in which two things are joined or associated","kor_ctx":"둘 사이의 관련성이나 연결 상태"}
+]},
+{"qn":38,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"crisis","syn":["emergency","predicament"],"ant":["stability","calm"],"kor":"위기","eng":"a time of intense difficulty or danger","kor_ctx":"매우 어렵거나 위험한 시점"},
+{"word":"clog up","syn":["obstruct","jam","block"],"ant":["clear","unclog"],"kor":"막히게 하다","eng":"to block or become blocked, so that movement is difficult","kor_ctx":"무언가가 막혀서 흐르지 않게 만들다"},
+{"word":"involuntary","syn":["forced","compulsory"],"ant":["voluntary","willing","intentional"],"kor":"본의 아닌, 강제적인","eng":"done without one's conscious will or intention","kor_ctx":"자기 의지와 상관없이 강제로 일어나는"},
+{"word":"complex","syn":["intricate","complicated"],"ant":["simple","straightforward","plain"],"kor":"복잡한","eng":"consisting of many interconnected parts","kor_ctx":"부분이 많아서 간단하지 않은"},
+{"word":"labor surplus","syn":["oversupply of labor","excess labor"],"ant":["labor deficit","labor shortage","worker scarcity"],"kor":"노동 과잉","eng":"a situation where there are more workers than jobs available","kor_ctx":"일할 수 있는 일보다 일할 사람이 더 많은 상태"},
+{"word":"flexible","syn":["adaptable","versatile","pliant"],"ant":["rigid","inflexible","unyielding"],"kor":"유연한, 융통성 있는","eng":"able to change or be changed easily according to the situation","kor_ctx":"상황에 따라 쉽게 바뀌거나 적응하는"},
+{"word":"endure","syn":["tolerate","withstand","bear"],"ant":["yield to","surrender to","succumb to"],"kor":"견디다, 참다","eng":"to suffer through something painful or difficult patiently","kor_ctx":"고통이나 고난을 참고 견디다"}
+]},
+{"qn":39,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"temptation","syn":["allure","enticement","appeal"],"ant":["deterrence","discouragement","repulsion"],"kor":"유혹","eng":"a strong desire to have or do something even though it may be harmful","kor_ctx":"하고 싶은 충동이나 유혹"},
+{"word":"expand","syn":["increase","broaden","enlarge"],"ant":["shrink","contract","reduce"],"kor":"확장하다, 확대하다","eng":"to become or make something larger in size or scope","kor_ctx":"크기나 범위를 더 크게 하다"},
+{"word":"ideal","syn":["perfect","optimal","exemplary"],"ant":["imperfect","flawed","undesirable"],"kor":"이상적인","eng":"satisfying the highest standards; perfect","kor_ctx":"가장 완벽하거나 모범적인"},
+{"word":"convertible into","syn":["transformable into","changeable into"],"ant":["unchangeable from","fixed as","immutable as"],"kor":"~로 전환 가능한","eng":"able to be changed into something else","kor_ctx":"다른 것으로 바꿀 수 있는"},
+{"word":"misleading","syn":["deceptive","false","confusing"],"ant":["clear","truthful","accurate"],"kor":"오해를 불러일으키는","eng":"causing one to think something that is not true","kor_ctx":"잘못된 인상을 주거나 오해하게 만드는"}
+]},
+{"qn":40,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"considerable","syn":["substantial","significant","great"],"ant":["slight","negligible","minor"],"kor":"상당한","eng":"great in amount, extent, or importance","kor_ctx":"양이나 정도가 상당히 큰"},
+{"word":"be responsible for","syn":["be accountable for","be in charge of"],"ant":["be free from","be unrelated to"],"kor":"~을 담당하다, 책임이 있다","eng":"to have the duty of dealing with something","kor_ctx":"어떤 일을 맡아 처리할 의무가 있다"},
+{"word":"reduce","syn":["decrease","lessen","diminish"],"ant":["increase","enhance","boost"],"kor":"줄이다","eng":"to make something smaller or less in amount","kor_ctx":"양이나 크기를 더 적게 만들다"},
+{"word":"deliberative","syn":["thoughtful","reflective"],"ant":["impulsive","spontaneous","rash"],"kor":"숙고적인, 신중한","eng":"carefully thinking over something before deciding","kor_ctx":"신중하게 깊이 생각하는"},
+{"word":"contradict","syn":["oppose","refute","challenge"],"ant":["confirm","support","corroborate"],"kor":"모순되다","eng":"to say the opposite of what someone else says; to be inconsistent with","kor_ctx":"상반되는 말을 하여 반박하다"},
+{"word":"unemotional","syn":["dispassionate","impassive"],"ant":["emotional","sensitive"],"kor":"감정적이지 않은","eng":"not showing strong feelings","kor_ctx":"감정을 드러내지 않는"},
+{"word":"optimal","syn":["best","ideal","perfect"],"ant":["suboptimal","worst","inferior"],"kor":"최적의","eng":"best or most favorable; optimum","kor_ctx":"가장 좋거나 유리한 상태의"}
+]},
+{"qn":41,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"be confronted with","syn":["face","encounter","meet"],"ant":["avoid","evade","shun"],"kor":"~에 직면하다","eng":"to be faced with something difficult or unpleasant","kor_ctx":"어떤 어려운 상황을 마주하다"}
+]},
+{"qn":42,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"disruptive","syn":["disturbing","unsettling","troublesome"],"ant":["calming","constructive"],"kor":"혼란스러운, 방해하는","eng":"causing disorder or interruption","kor_ctx":"질서를 어지럽히거나 방해가 되는"},
+{"word":"acknowledge","syn":["admit","recognize","concede"],"ant":["deny","reject","disregard"],"kor":"인정하다","eng":"to accept or admit that something is true","kor_ctx":"사실임을 받아들이거나 인정하다"},
+{"word":"regret","syn":["lament","deplore","repent"],"ant":["embrace","approve"],"kor":"후회하다","eng":"to feel sad or sorry about something","kor_ctx":"잘못한 일이나 잃어버린 것에 대해 슬퍼하다"},
+{"word":"constrain","syn":["restrict","limit","inhibit"],"ant":["facilitate","enable"],"kor":"~을 제약[제한]하다","eng":"to limit or restrict something","kor_ctx":"어떤 것을 제한하거나 억누르다"},
+{"word":"stressed","syn":["anxious","tense","worried"],"ant":["relaxed","calm","tranquil"],"kor":"스트레스 받는","eng":"feeling worried or under pressure","kor_ctx":"심리적 부담이나 긴장을 느끼는"}
+]},
+{"qn":43,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"excited","syn":["thrilled","eager","enthusiastic"],"ant":["bored","indifferent","unexcited"],"kor":"들떤","eng":"feeling very eager and enthusiastic","kor_ctx":"매우 기대감이 들거나 들뜬"}
+]},
+{"qn":44,"y":2025,"m":6,"exam":"모의고사","w":[
+]},
+{"qn":45,"y":2025,"m":6,"exam":"모의고사","w":[
+{"word":"hesitate","syn":["waver","pause","falter"],"ant":["proceed","decide","act"],"kor":"망설이다","eng":"to pause before doing something due to uncertainty","kor_ctx":"확실하지 않아 잠시 주저하다"},
+{"word":"assist","syn":["help","aid","support"],"ant":["hinder","obstruct","impede"],"kor":"돕다","eng":"to help someone do something","kor_ctx":"다른 사람을 도와주다"},
+{"word":"urgency","syn":["criticality","exigency"],"ant":["calmness"],"kor":"긴박함, 급박함","eng":"the quality of needing immediate attention or action","kor_ctx":"바로 처리해야 할 급한 성질"},
+{"word":"reassure","syn":["comfort","console","soothe"],"ant":["alarm","worry","upset"],"kor":"안심시키다","eng":"to remove doubts or fears from someone","kor_ctx":"마음을 가라앉혀 안심하게 하다"},
+{"word":"dizzy","syn":["giddy","light-headed","faint"],"ant":["clear-headed"],"kor":"어지러운","eng":"feeling as if everything is spinning and one may fall","kor_ctx":"주변이 빙빙 도는 듯한 느낌이 드는"},
+{"word":"peaceful","syn":["calm","tranquil","serene"],"ant":["chaotic","turbulent","noisy"],"kor":"평화로운","eng":"free from disturbance; calm and quiet","kor_ctx":"소란스럽지 않고 잔잔하고 고요한"}
+]}
+];
+
+MOCK_RAW.forEach(q => {
+  q.w.forEach(w => {
+    if (!w.word) return;
+    WORDS.push({
+      id: 'mk_' + (WORDS.length + 1).toString().padStart(4, '0'),
+      word: w.word,
+      syn: w.syn || [],
+      ant: w.ant || [],
+      kor: w.kor || '',
+      eng: w.eng || '',
+      kor_ctx: w.kor_ctx || '',
+      grade: '고2',
+      year: q.y,
+      month: q.m,
+      exam: q.exam,
+      questionNo: q.qn
+    });
+  });
+});
+
 /* ═══════════════ STATE ═══════════════ */
 let currentView = 'home';
 const filters = {grade:'',year:'',month:'',exam:'',publisher:'',questionNos:[]};
