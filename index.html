@@ -76,6 +76,16 @@ main{max-width:920px;margin:0 auto;padding:18px 16px 80px}
 .btn-ok{background:var(--ok);color:#fff}
 .btn-danger{background:#fee2e2;color:#991b1b}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* WORKBOOK CARDS */
+.wb-head{font-size:14px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.wb-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.wb-card{border:1px solid var(--border);border-radius:var(--r);padding:12px;background:var(--bg)}
+.wb-card.on{border-color:var(--p);background:#eef2ff}
+.wb-title{font-size:14px;font-weight:700;color:var(--p)}
+.wb-meta{font-size:11px;color:var(--muted);margin:4px 0 8px}
+.wb-btns{display:flex;gap:5px;flex-wrap:wrap}
 
 /* WORD LIST */
 .word-list{display:grid;gap:10px}
@@ -195,6 +205,26 @@ main{max-width:920px;margin:0 auto;padding:18px 16px 80px}
   border-radius:8px;padding:10px 14px;margin-bottom:14px;line-height:1.5}
 [contenteditable]{outline:none}
 
+/* PRINT — 시험지만 인쇄된다 */
+#print-area{display:none}
+@media print{
+  body>*:not(#print-area){display:none!important}
+  #print-area{display:block!important}
+  .sheet-page{page-break-after:always}
+  .sheet-page:last-child{page-break-after:auto}
+}
+#print-area{font-family:'Malgun Gothic',sans-serif;color:#000}
+.sheet-head{border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:14px}
+.sheet-title{font-size:18px;font-weight:800}
+.sheet-sub{font-size:12px;margin-top:4px;display:flex;gap:18px;flex-wrap:wrap}
+.sheet-q{display:flex;gap:8px;padding:7px 0;border-bottom:1px dotted #bbb;font-size:13px;page-break-inside:avoid}
+.sheet-no{min-width:26px;font-weight:700}
+.sheet-word{min-width:170px;font-weight:600}
+.sheet-blank{flex:1;border-bottom:1px solid #999;min-height:18px}
+.sheet-choices{display:flex;gap:14px;flex-wrap:wrap;font-size:12px}
+.sheet-ans{font-size:12px;columns:2;column-gap:28px}
+.sheet-ans div{padding:2px 0;break-inside:avoid}
+
 /* RESPONSIVE */
 @media(max-width:600px){
   .topbar h1{font-size:16px}
@@ -225,7 +255,11 @@ main{max-width:920px;margin:0 auto;padding:18px 16px 80px}
       <div class="stat"><div class="stat-n" id="stat-words">0</div><div class="stat-l">전체 단어</div></div>
       <div class="stat"><div class="stat-n" id="stat-filtered">0</div><div class="stat-l">필터 결과</div></div>
       <div class="stat"><div class="stat-n" id="stat-wrong">0</div><div class="stat-l">오답</div></div>
+      <div class="stat"><div class="stat-n" id="stat-today">0</div><div class="stat-l">오늘 학습</div></div>
+      <div class="stat"><div class="stat-n" id="stat-streak">0</div><div class="stat-l">연속 학습(일)</div></div>
     </div>
+    <div id="today-card"></div>
+    <div id="workbook-cards"></div>
     <div class="card">
       <div class="filters" id="filter-bar"></div>
       <div class="btn-row">
@@ -262,6 +296,8 @@ main{max-width:920px;margin:0 auto;padding:18px 16px 80px}
     <div id="teacher-area"></div>
   </div>
 </main>
+
+<div id="print-area"></div>
 
 <script>
 /* ═══════════════ DATA ═══════════════ */
@@ -1712,6 +1748,10 @@ WORKBOOK_RAW.forEach(w => {
 let currentView = 'home';
 const filters = {grade:'',year:'',month:'',exam:'',publisher:'',questionNos:[]};
 let wrongWords = JSON.parse(localStorage.getItem('wrong_words') || '{}');
+// 단어별 학습 기록: {단어id: {right, wrong, day:'2026-09-22', last: 시각}}
+let studyLog = JSON.parse(localStorage.getItem('study_log') || '{}');
+// 연속 학습 일수: {day:'2026-09-22', days:3}
+let studyStreak = JSON.parse(localStorage.getItem('study_streak') || '{}');
 
 const teacherMode = new URLSearchParams(location.search).get('teacher') === '1';
 
@@ -1762,6 +1802,188 @@ const getFiltered = () => WORDS.filter(w => {
 
 const uniqueValues = key => [...new Set(WORDS.map(w => w[key]))].filter(Boolean).sort();
 
+/* ═══════════════ 학습 기록 ═══════════════ */
+const 오늘날짜 = () => new Date().toLocaleDateString('sv-SE'); // 2026-09-22 (그 기기의 날짜)
+const 어제날짜 = () => new Date(Date.now() - 864e5).toLocaleDateString('sv-SE');
+
+// 퀴즈에서 한 문제 풀 때마다 부른다
+function recordStudy(word, 맞음) {
+  const 기록 = studyLog[word.id] || {right: 0, wrong: 0};
+  기록[맞음 ? 'right' : 'wrong']++;
+  기록.day = 오늘날짜();
+  기록.last = Date.now();
+  studyLog[word.id] = 기록;
+  localStorage.setItem('study_log', JSON.stringify(studyLog));
+
+  if (studyStreak.day !== 오늘날짜()) {
+    studyStreak = {day: 오늘날짜(), days: studyStreak.day === 어제날짜() ? (studyStreak.days || 0) + 1 : 1};
+    localStorage.setItem('study_streak', JSON.stringify(studyStreak));
+  }
+}
+
+const 오늘학습한수 = () => Object.values(studyLog).filter(기록 => 기록.day === 오늘날짜()).length;
+
+// 급한 단어부터: 틀린 단어 → 아직 안 본 단어 → 오래 안 본 단어. 오늘 이미 본 단어는 맨 뒤
+const 급함 = w => {
+  const 기록 = studyLog[w.id];
+  if (기록 && 기록.day === 오늘날짜()) return 0;
+  if (wrongWords[w.id]) return 4;
+  if (!기록) return 3;
+  return 2;
+};
+
+// 유의어·반의어가 있으면 고르기 문제, 없으면 뜻 쓰기 문제로 낸다 (한 단어도 빠뜨리지 않게)
+const 오늘학습풀 = () => getFiltered().filter(w => w.syn.length || w.ant.length || w.kor);
+
+function 오늘학습목록(개수 = 20) {
+  // 먼저 섞어야 급함이 같은 단어들 중에서 매번 다른 단어가 나온다
+  return shuffle(오늘학습풀())
+    .sort((a, b) => 급함(b) - 급함(a) || (studyLog[a.id]?.last || 0) - (studyLog[b.id]?.last || 0))
+    .slice(0, 개수);
+}
+
+function renderTodayCard() {
+  const 목록 = 오늘학습목록();
+  const 남은범위 = 이어하기범위();
+  document.getElementById('today-card').innerHTML = `
+    <div class="card">
+      <div class="wb-head">🎯 오늘 학습</div>
+      <div class="tip" style="margin-bottom:10px">틀린 단어와 아직 안 본 단어를 먼저 골라 ${목록.length}문제를 냅니다. 지금 걸린 필터 범위에서 고릅니다.</div>
+      <div class="btn-row" style="margin-bottom:0">
+        <button class="btn btn-p" onclick="startToday()" ${목록.length < 2 ? 'disabled' : ''}>🎯 오늘 학습 시작 (${목록.length}문제)</button>
+        ${남은범위 ? `<button class="btn btn-o" onclick="이어하기()">↩ 이어하기: ${esc(남은범위.이름)}</button>` : ''}
+      </div>
+    </div>`;
+}
+
+function startToday() {
+  const 목록 = 오늘학습목록();
+  if (목록.length < 2) return;
+  const qs = [];
+  목록.forEach(w => {
+    if (w.syn.length) qs.push({w, kind: 'syn', answer: w.syn[0 | Math.random() * w.syn.length], opts: w.syn, mode: 'syn-mcq'});
+    else if (w.ant.length) qs.push({w, kind: 'ant', answer: w.ant[0 | Math.random() * w.ant.length], opts: w.ant, mode: 'ant-mcq'});
+    else if (w.kor) qs.push({w, kind: 'kor', answer: w.word, mode: 'write'});
+  });
+  qState = {mode: 'mcq', qs: shuffle(qs), idx: 0, score: 0, wrong: []};
+  setView('quiz-mcq');
+  renderQ();
+}
+
+/* ═══════════════ 이어하기 ═══════════════ */
+const 범위열쇠 = () => JSON.stringify({...filters, questionNos: [...filters.questionNos].sort()});
+const 범위이름 = f => {
+  const 조각 = [];
+  if (f.publisher) 조각.push(f.publisher);
+  else if (f.year) 조각.push(`${f.year}년 ${f.month}월`);
+  else if (f.exam) 조각.push(f.exam);
+  else if (f.grade) 조각.push(f.grade);
+  if (f.questionNos && f.questionNos.length) 조각.push(f.questionNos.join(',') + (f.exam === '교과서' ? '과' : '번'));
+  return 조각.join(' · ');
+};
+
+function 범위저장() {
+  const 이름 = 범위이름(filters);
+  if (!이름) return;                       // 전체 범위는 저장할 것이 없다
+  localStorage.setItem('last_scope', JSON.stringify(filters));
+}
+
+function 이어하기범위() {
+  try {
+    const 저장 = JSON.parse(localStorage.getItem('last_scope') || 'null');
+    if (!저장) return null;
+    const 이름 = 범위이름(저장);
+    if (!이름 || JSON.stringify(저장) === JSON.stringify(filters)) return null;
+    return {범위: 저장, 이름};
+  } catch { return null; }
+}
+
+function 이어하기() {
+  const 지난번 = 이어하기범위();
+  if (!지난번) return;
+  Object.assign(filters, 지난번.범위);
+  renderHome();
+}
+
+/* ═══════════════ 워크북 카드 ═══════════════ */
+// 워크북 한 권 = 교과서면 (학년·교재), 시험이면 (학년·연월). 카드를 누르면 그 범위로 필터가 걸린다
+const workbookOf = w => w.exam === '교과서'
+  ? {label: w.publisher || '교과서', filter: {grade: w.grade, exam: '교과서', publisher: w.publisher || ''}}
+  : {label: `${w.year}년 ${w.month}월 ${w.exam}`, filter: {grade: w.grade, exam: w.exam, year: String(w.year), month: String(w.month)}};
+
+function workbookGroups() {
+  const map = new Map();
+  WORDS.forEach(w => {
+    const wb = workbookOf(w);
+    const key = JSON.stringify(wb.filter);
+    let g = map.get(key);
+    if (!g) { g = {...wb, grade: w.grade, count: 0, questions: new Set()}; map.set(key, g); }
+    g.count++;
+    g.questions.add(w.questionNo);
+  });
+  // 교과서를 먼저(학년·교재순), 시험은 최신 시험부터
+  const 순서 = g => g.filter.exam === '교과서'
+    ? [0, g.grade, g.label, 0]
+    : [1, g.grade, '', -(Number(g.filter.year) * 100 + Number(g.filter.month))];
+  return [...map.values()].sort((a, b) => {
+    const [ax, ag, al, ad] = 순서(a), [bx, bg, bl, bd] = 순서(b);
+    return ax - bx || ag.localeCompare(bg) || al.localeCompare(bl) || ad - bd;
+  });
+}
+
+// 카드가 지금 걸린 필터와 같은 범위인지
+const sameScope = f => Object.keys(f).every(k => String(filters[k] || '') === String(f[k] || ''));
+
+function renderWorkbookCards() {
+  const groups = workbookGroups();
+  document.getElementById('workbook-cards').innerHTML = `
+    <div class="card">
+      <div class="wb-head">📘 워크북 바로가기 <span style="font-size:11px;font-weight:500;color:var(--muted)">(${groups.length}권 · 누르면 그 범위만 학습해요)</span></div>
+      <div class="wb-cards">${groups.map((g, i) => `
+        <div class="wb-card${sameScope(g.filter) ? ' on' : ''}">
+          <div class="wb-title">${esc(g.label)}</div>
+          <div class="wb-meta">${esc(g.grade)} · 단어 ${g.count}개 · ${g.questions.size}${g.filter.exam === '교과서' ? '과' : '지문'}</div>
+          <div class="wb-btns">
+            <button class="btn btn-p btn-sm" onclick="openWorkbook(${i},'home')">단어 보기</button>
+            <button class="btn btn-o btn-sm" onclick="openWorkbook(${i},'flashcard')">🃏 카드</button>
+            <button class="btn btn-o btn-sm" onclick="openWorkbook(${i},'quiz-mcq')">✏️ 퀴즈</button>
+            ${teacherMode ? `<button class="btn btn-o btn-sm" id="wb-link-${i}" onclick="copyWorkbookLink(${i})">🔗 링크</button>` : ''}
+          </div>
+        </div>`).join('')}</div>
+    </div>`;
+}
+
+function openWorkbook(i, view) {
+  const g = workbookGroups()[i];
+  if (!g) return;
+  Object.keys(filters).forEach(k => { filters[k] = Array.isArray(filters[k]) ? [] : ''; });
+  Object.assign(filters, g.filter);
+  setView(view);
+}
+
+// 수업이나 문제집 QR에 걸 링크. 이 주소를 열면 그 범위로 시작한다
+function workbookLink(filter, view) {
+  const q = new URLSearchParams();
+  const 이름 = {grade: 'grade', exam: 'exam', publisher: 'pub', year: 'year', month: 'month'};
+  Object.keys(이름).forEach(k => { if (filter[k]) q.set(이름[k], filter[k]); });
+  if (view && view !== 'home') q.set('view', view);
+  return location.origin + location.pathname + '?' + q;
+}
+
+function copyWorkbookLink(i) {
+  const g = workbookGroups()[i];
+  if (!g) return;
+  const url = workbookLink(g.filter);
+  const btn = document.getElementById('wb-link-' + i);
+  const 알림 = 글 => { if (btn) { btn.textContent = 글; setTimeout(() => { btn.textContent = '🔗 링크'; }, 2000); } };
+  // 클립보드를 못 쓰는 환경(구형 브라우저·http)에서는 주소창에 링크를 띄워 직접 복사하게 한다
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => 알림('✓ 복사됨'), () => 알림('복사 실패'));
+  } else {
+    알림('복사 불가');
+  }
+}
+
 /* ═══════════════ RENDER HOME ═══════════════ */
 function renderHome() {
   wordListLimit = WORD_LIST_STEP; // 필터가 바뀌면 목록을 처음부터 다시 보여준다
@@ -1769,6 +1991,8 @@ function renderHome() {
   document.getElementById('stat-words').textContent = WORDS.length;
   document.getElementById('stat-filtered').textContent = filtered.length;
   document.getElementById('stat-wrong').textContent = Object.keys(wrongWords).length;
+  document.getElementById('stat-today').textContent = 오늘학습한수();
+  document.getElementById('stat-streak').textContent = studyStreak.day === 오늘날짜() ? (studyStreak.days || 0) : 0;
   
   // Filter bar
   const fb = document.getElementById('filter-bar');
@@ -1854,7 +2078,10 @@ function renderHome() {
     renderHome();
   };
   
+  renderTodayCard();
+  renderWorkbookCards();
   renderWordList();
+  범위저장();
 }
 
 function toggleQ(q) {
@@ -1925,11 +2152,18 @@ function renderFlashcard() {
     return;
   }
   fcList = filtered;
-  fcIdx = 0;
+  // 지난번에 보던 자리에서 이어 본다
+  const 저장위치 = JSON.parse(localStorage.getItem('fc_pos') || '{}')[범위열쇠()];
+  fcIdx = Math.min(저장위치 || 0, fcList.length - 1);
   showFC();
 }
 function showFC() {
   const w = fcList[fcIdx];
+  try {
+    const 자리 = JSON.parse(localStorage.getItem('fc_pos') || '{}');
+    자리[범위열쇠()] = fcIdx;
+    localStorage.setItem('fc_pos', JSON.stringify(자리));
+  } catch {}
   document.getElementById('fc-area').innerHTML = `
     <div class="fc-wrap" onclick="document.getElementById('fc-card').classList.toggle('flipped')">
       <div class="fc" id="fc-card">
@@ -2064,12 +2298,20 @@ function renderQ() {
         ${qState.wrong.length ? `<div style="text-align:left;margin-top:20px"><strong style="color:var(--err)">❌ 틀린 단어 복습 (${qState.wrong.length}개)</strong></div>
           ${qState.wrong.map(w=>`<div class="ritem"><div class="ritem-w">${esc(w.word.word)}</div><div class="ritem-c">정답: ${esc(w.answer)}</div></div>`).join('')}
         </div>` : ''}
+        <div style="margin-top:16px;text-align:left">
+          <label class="fl">이름 (선생님께 보낼 때 씁니다)</label>
+          <input id="student-name" class="fi" placeholder="홍길동">
+        </div>
         <div class="btn-row" style="justify-content:center;margin-top:18px">
           <button class="btn btn-p" onclick="${qState.mode === 'exam' ? 'renderExam()' : `renderQuizSetup('${qState.mode}')`}">다시 풀기</button>
+          <button class="btn btn-o" id="copy-result" onclick="copyResult()">📋 결과 복사</button>
           <button class="btn btn-o" onclick="setView('home')">홈으로</button>
         </div>
       </div>
     `;
+    // 이름은 속성이 아니라 값으로 넣는다 (esc는 따옴표를 바꾸지 않아 속성 탈출이 가능하다)
+    const 이름칸 = document.getElementById('student-name');
+    if (이름칸) 이름칸.value = localStorage.getItem('student_name') || '';
     return;
   }
   
@@ -2126,6 +2368,7 @@ function renderQ() {
 function pickChoice(btn, ans) {
   document.querySelectorAll('.choice').forEach(b => b.disabled = true);
   const sel = btn.dataset.val;
+  recordStudy(qState.qs[qState.idx].w, sel === ans);
   if (sel === ans) {
     btn.classList.add('correct');
     qState.score++;
@@ -2146,6 +2389,7 @@ function submitWrite(correct) {
   const v = inp.value.trim().toLowerCase();
   inp.disabled = true;
   const correct2 = correct.toLowerCase();
+  recordStudy(qState.qs[qState.idx].w, v === correct2);
   if (v === correct2) {
     inp.classList.add('correct');
     qState.score++;
@@ -2158,6 +2402,29 @@ function submitWrite(correct) {
   localStorage.setItem('wrong_words', JSON.stringify(wrongWords));
   updateWrongBadge();
   setTimeout(() => { qState.idx++; renderQ(); }, 1200);
+}
+
+// 학생이 결과를 복사해 카카오톡으로 선생님께 보낸다 (서버가 없어도 결과가 전달된다)
+function copyResult() {
+  if (!qState) return;
+  const 이름 = (document.getElementById('student-name')?.value || '').trim();
+  if (이름) localStorage.setItem('student_name', 이름);
+  const 줄 = [
+    (이름 || '이름없음') + ' · 단어 퀴즈 결과',
+    '범위: ' + (범위이름(filters) || '전체'),
+    '점수: ' + qState.score + ' / ' + qState.qs.length,
+    '날짜: ' + new Date().toLocaleString('ko-KR')
+  ];
+  if (qState.wrong.length) {
+    줄.push('틀린 단어 ' + qState.wrong.length + '개:');
+    qState.wrong.forEach(x => 줄.push('  - ' + x.word.word + ' (정답: ' + x.answer + ')'));
+  } else {
+    줄.push('틀린 단어 없음');
+  }
+  const btn = document.getElementById('copy-result');
+  const 알림 = 말 => { if (btn) { btn.textContent = 말; setTimeout(() => { btn.textContent = '📋 결과 복사'; }, 2000); } };
+  if (navigator.clipboard) navigator.clipboard.writeText(줄.join('\n')).then(() => 알림('✓ 복사됨'), () => 알림('복사 실패'));
+  else 알림('복사 불가');
 }
 
 function quitQuiz() { 
@@ -2301,6 +2568,29 @@ function renderTeacher() {
     </div>
     
     <div class="card">
+      <h3 style="margin:0 0 8px;font-size:14px">🖨 단어시험지 인쇄</h3>
+      <div class="tip">지금 홈에서 걸어둔 필터 범위(<strong>${getFiltered().length}개</strong>)로 시험지를 만듭니다. 범위는 홈에서 바꾸세요.</div>
+      <div class="fg-row">
+        <div class="fg"><label class="fl">유형</label>
+          <select id="sheet-type" class="fi">
+            <option value="kor">영어 단어 → 뜻 쓰기</option>
+            <option value="eng">한글 뜻 → 영어 쓰기</option>
+            <option value="syn">유의어 고르기 (4지선다)</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">문항 수</label><input id="sheet-count" class="fi" type="number" value="25" min="1" max="100"></div>
+        <div class="fg"><label class="fl">정답지</label>
+          <select id="sheet-answer" class="fi"><option value="1">같이 인쇄 (별지)</option><option value="0">빼기</option></select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="printSheet()">🖨 시험지 만들고 인쇄</button>
+        <button class="btn btn-o" onclick="exportFilteredCsv()">⬇ 이 범위 단어 CSV</button>
+      </div>
+      <div id="sheet-msg" style="font-size:12px;color:var(--err)"></div>
+    </div>
+
+    <div class="card">
       <h3 style="margin:0 0 8px;font-size:14px">📊 오답 통계 (이 브라우저)</h3>
       <div id="teacher-stats"></div>
     </div>
@@ -2311,6 +2601,76 @@ function renderTeacher() {
     </div>
   `;
   updateTeacherStats();
+}
+
+/* ═══════════════ 단어시험지 인쇄 ═══════════════ */
+// 시험지는 화면에 안 그리고 #print-area에만 담아 인쇄한다 (@media print)
+function sheetRows(type, 개수) {
+  const 쓸단어 = getFiltered().filter(w => type === 'syn' ? w.syn.length : (type === 'eng' ? w.kor : (w.kor || w.eng)));
+  return shuffle(쓸단어).slice(0, 개수);
+}
+
+function printSheet() {
+  const type = document.getElementById('sheet-type').value;
+  const 개수 = Math.max(1, Math.min(100, parseInt(document.getElementById('sheet-count').value) || 25));
+  const 정답지 = document.getElementById('sheet-answer').value === '1';
+  const 단어들 = sheetRows(type, 개수);
+  const 알림칸 = document.getElementById('sheet-msg');
+  if (!단어들.length) {
+    알림칸.textContent = '이 범위에는 그 유형으로 낼 수 있는 단어가 없어요. 홈에서 범위를 넓혀보세요.';
+    return;
+  }
+  알림칸.textContent = '';
+
+  const 범위 = 범위이름(filters) || '전체 범위';
+  const 날짜 = new Date().toLocaleDateString('ko-KR');
+  const 머리 = 제목 => `
+    <div class="sheet-head">
+      <div class="sheet-title">${esc(제목)}</div>
+      <div class="sheet-sub"><span>범위: ${esc(범위)}</span><span>${esc(날짜)}</span><span>이름: ____________</span><span>점수: ______ / ${단어들.length}</span></div>
+    </div>`;
+
+  // 유의어 고르기의 오답 보기는 다른 단어의 유의어에서 뽑는다
+  const 보기주머니 = [...new Set(WORDS.flatMap(w => w.syn))].filter(Boolean);
+  const 답 = [];
+  const 문항 = 단어들.map((w, i) => {
+    const 번호 = `<div class="sheet-no">${i + 1}.</div>`;
+    if (type === 'syn') {
+      const 정답 = w.syn[0];
+      const 오답 = shuffle(보기주머니.filter(x => x !== 정답 && !w.syn.includes(x))).slice(0, 3);
+      const 보기 = shuffle([정답, ...오답]);
+      답.push(`${'①②③④'[보기.indexOf(정답)]} ${정답}`);
+      return `<div class="sheet-q">${번호}<div><div class="sheet-word">${esc(w.word)}</div>
+        <div class="sheet-choices">${보기.map((b, n) => `<span>${'①②③④'[n]} ${esc(b)}</span>`).join('')}</div></div></div>`;
+    }
+    if (type === 'eng') {
+      답.push(w.word);
+      return `<div class="sheet-q">${번호}<div class="sheet-word">${esc(w.kor)}</div><div class="sheet-blank"></div></div>`;
+    }
+    답.push(w.kor || w.eng);
+    return `<div class="sheet-q">${번호}<div class="sheet-word">${esc(w.word)}</div><div class="sheet-blank"></div></div>`;
+  }).join('');
+
+  const 답안 = 답.map((a, i) => `<div>${i + 1}. ${esc(String(a))}</div>`).join('');
+  document.getElementById('print-area').innerHTML = `
+    <div class="sheet-page">${머리('단어 시험')}${문항}</div>
+    ${정답지 ? `<div class="sheet-page">${머리('단어 시험 — 정답지')}<div class="sheet-ans">${답안}</div></div>` : ''}`;
+  window.print();
+}
+
+/* ═══════════════ 지금 범위만 CSV로 ═══════════════ */
+function exportFilteredCsv() {
+  const 칸 = 값 => '"' + String(값 == null ? '' : 값).replace(/"/g, '""') + '"';
+  const 머리 = ['word','synonyms','antonyms','kor','eng','kor_ctx','ex','grade','year','month','exam','publisher','questionNo'];
+  const 줄들 = getFiltered().map(w => [w.word, w.syn.join(', '), w.ant.join(', '), w.kor, w.eng,
+    w.kor_ctx, w.ex || '', w.grade, w.year, w.month, w.exam, w.publisher || '', w.questionNo].map(칸).join(','));
+  // 엑셀이 한글을 깨뜨리지 않게 BOM을 붙인다
+  const blob = new Blob(['\uFEFF' + [머리.join(','), ...줄들].join('\r\n')], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '단어_' + (범위이름(filters) || '전체').replace(/[\\/:*?"<>|]/g, '') + '_' + 오늘날짜() + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 function updateTeacherStats() {
@@ -2496,7 +2856,17 @@ function init() {
   });
   
   updateWrongBadge();
-  renderHome();
+  
+  // 주소에 범위가 적혀 있으면 그 범위로 시작한다 (수업·문제집 QR 링크)
+  const 주소 = new URLSearchParams(location.search);
+  const 받기 = (열쇠, 항목) => { const 값 = 주소.get(열쇠); if (값) filters[항목] = 값; };
+  받기('grade', 'grade'); 받기('exam', 'exam'); 받기('pub', 'publisher');
+  받기('year', 'year'); 받기('month', 'month');
+  const 문항 = 주소.get('q');
+  if (문항) filters.questionNos = 문항.split(',').map(s => s.trim()).filter(Boolean);
+  const 화면 = 주소.get('view');
+  const 아는화면 = ['home','flashcard','quiz-mcq','quiz-write','exam','wrong'];
+  setView(아는화면.includes(화면) ? 화면 : 'home');
   
   // Keyboard shortcuts for flashcard
   document.addEventListener('keydown', e => {
