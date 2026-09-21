@@ -265,6 +265,7 @@ main{max-width:920px;margin:0 auto;padding:18px 16px 80px}
       <div class="btn-row">
         <button class="btn btn-o" id="clear-filter">🔄 필터 초기화</button>
       </div>
+      <div id="scope-link-row"></div>
     </div>
     <div id="word-list-container"></div>
   </div>
@@ -1905,6 +1906,51 @@ function 이어하기() {
   renderHome();
 }
 
+/* ═══════════════ 지금 범위 링크 (선생님용) ═══════════════ */
+// 홈에서 고른 그대로(학년·교재·과까지) 학생에게 줄 링크를 만든다
+function renderScopeLink() {
+  const 칸 = document.getElementById('scope-link-row');
+  if (!칸) return;
+  if (!teacherMode) { 칸.innerHTML = ''; return; }
+  const 범위 = 범위이름(filters) || '전체';
+  칸.innerHTML = `
+    <div style="border-top:1px dashed var(--border);margin-top:4px;padding-top:12px">
+      <label class="fl">학생에게 줄 링크 — 지금 범위: <strong>${esc(범위)}</strong> (${getFiltered().length}개)</label>
+      <div class="btn-row" style="margin-bottom:8px">
+        <select id="scope-view" class="fi" style="max-width:190px" onchange="scopeViewChanged(this.value)">
+          <option value="home">단어장으로 열기</option>
+          <option value="flashcard">플래시카드로 열기</option>
+          <option value="quiz-mcq">객관식 퀴즈로 열기</option>
+          <option value="quiz-write">주관식 퀴즈로 열기</option>
+          <option value="exam">모의시험으로 열기</option>
+        </select>
+        <button class="btn btn-p" id="scope-link-btn" onclick="copyScopeLink()">🔗 이 링크 복사</button>
+      </div>
+      <input id="scope-link-text" class="fi" readonly onclick="this.select()" value="">
+    </div>`;
+  const 화면 = localStorage.getItem('scope_view') || 'home';
+  document.getElementById('scope-view').value = 화면;
+  document.getElementById('scope-link-text').value = workbookLink(filters, 화면);
+}
+
+// 고른 시작 화면을 기억한 뒤 링크를 다시 만든다
+function scopeViewChanged(화면) {
+  localStorage.setItem('scope_view', 화면);
+  renderScopeLink();
+}
+
+function copyScopeLink() {
+  const 화면 = document.getElementById('scope-view')?.value || 'home';
+  localStorage.setItem('scope_view', 화면);
+  const url = workbookLink(filters, 화면);
+  const 칸 = document.getElementById('scope-link-text');
+  if (칸) { 칸.value = url; 칸.select(); }
+  const btn = document.getElementById('scope-link-btn');
+  const 알림 = 말 => { if (btn) { btn.textContent = 말; setTimeout(() => { btn.textContent = '🔗 이 링크 복사'; }, 2000); } };
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => 알림('✓ 복사됨'), () => 알림('아래 칸에서 복사하세요'));
+  else 알림('아래 칸에서 복사하세요');
+}
+
 /* ═══════════════ 워크북 카드 ═══════════════ */
 // 워크북 한 권 = 교과서면 (학년·교재), 시험이면 (학년·연월). 카드를 누르면 그 범위로 필터가 걸린다
 const workbookOf = w => w.exam === '교과서'
@@ -1966,6 +2012,10 @@ function workbookLink(filter, view) {
   const q = new URLSearchParams();
   const 이름 = {grade: 'grade', exam: 'exam', publisher: 'pub', year: 'year', month: 'month'};
   Object.keys(이름).forEach(k => { if (filter[k]) q.set(이름[k], filter[k]); });
+  // 고른 과·문항까지 담아야 링크가 그 범위로 열린다
+  if (filter.questionNos && filter.questionNos.length) {
+    q.set('q', [...filter.questionNos].sort((a, b) => parseInt(a) - parseInt(b)).join(','));
+  }
   if (view && view !== 'home') q.set('view', view);
   return location.origin + location.pathname + '?' + q;
 }
@@ -1973,7 +2023,9 @@ function workbookLink(filter, view) {
 function copyWorkbookLink(i) {
   const g = workbookGroups()[i];
   if (!g) return;
-  const url = workbookLink(g.filter);
+  // 지금 그 교재를 보고 있다면 고른 과까지 링크에 담는다
+  const 범위 = sameScope(g.filter) ? {...g.filter, questionNos: filters.questionNos} : g.filter;
+  const url = workbookLink(범위);
   const btn = document.getElementById('wb-link-' + i);
   const 알림 = 글 => { if (btn) { btn.textContent = 글; setTimeout(() => { btn.textContent = '🔗 링크'; }, 2000); } };
   // 클립보드를 못 쓰는 환경(구형 브라우저·http)에서는 주소창에 링크를 띄워 직접 복사하게 한다
@@ -2078,6 +2130,7 @@ function renderHome() {
     renderHome();
   };
   
+  renderScopeLink();
   renderTodayCard();
   renderWorkbookCards();
   renderWordList();
